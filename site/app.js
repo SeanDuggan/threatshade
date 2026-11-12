@@ -325,6 +325,13 @@
     var p = P.filter(function (x) { return x.id === selected; })[0];
     var box = document.getElementById("dossier"); clear(box);
     if (!p) return;
+    var back = h("button", { type: "button", "class": "back-to-board", text: "↑ Back to the scoreboard" });
+    back.addEventListener("click", function () {
+      var row = rowEls[selected];
+      (row && row.parentNode ? row : document.getElementById("board")).scrollIntoView({ behavior: smooth(), block: "center" });
+      if (row) row.focus({ preventScroll: true });
+    });
+    box.appendChild(back);
     var sc = scoreOf(p), t = tierOf(sc);
     var rank = P.slice().sort(function (a, b) { return scoreOf(b) - scoreOf(a); }).indexOf(p) + 1;
     var cats = h("div", { "class": "cats" }, CATS.map(function (c) {
@@ -355,7 +362,12 @@
       ol.appendChild(li);
     });
   }
-  function select(id) { selected = id; render(); }
+  var narrow = window.matchMedia ? window.matchMedia("(max-width: 980px)") : null;
+  function smooth() { return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"; }
+  function select(id) {
+    selected = id; render();
+    if (narrow && narrow.matches) document.querySelector(".dossier").scrollIntoView({ behavior: smooth(), block: "start" });
+  }
   function render() { renderBoard(); shadeCounties(); drawMarkers(); renderDossier(); }
   function start(d, m, sitka) {
     checkData(d);

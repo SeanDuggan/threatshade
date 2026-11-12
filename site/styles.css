@@ -135,8 +135,14 @@ ol.srcs{columns:2;column-gap:32px;font-size:14px;padding-left:22px}
 ol.srcs li{break-inside:avoid;margin-bottom:6px}
 footer{background:#000;color:#f9f9f9;padding:44px 0;font-size:14px;text-align:center}
 footer a{color:#f9f9f9}
+.back-to-board{display:none}
 @media (max-width:980px){
   .app{grid-template-columns:1fr}
+  .leftcol{display:contents}
+  .leftcol > .panel{order:1}
+  .boardpanel{order:2}
+  .dossier{order:3;scroll-margin-top:64px}
+  .back-to-board{display:block;justify-self:start;font:inherit;font-size:14px;font-weight:600;color:var(--red);background:none;border:0;padding:10px 0;cursor:pointer}
   .boardpanel{position:static}
   ol.board{max-height:none}
   .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -149,7 +155,19 @@ footer a{color:#f9f9f9}
   .rank,.score b{font-size:24px}
   .cat{grid-template-columns:100px minmax(0,1fr) 78px}
   .big{font-size:64px}
-  nav{gap:14px}
+  .wrap{padding:0 16px}
+  header.top .wrap{min-height:48px;justify-content:center}
+  nav{gap:14px;flex-wrap:nowrap}
+  nav a{font-size:14px;padding:12px 0;white-space:nowrap}
+  .hero{padding-block:24px 20px}
+  .facts{gap:8px;margin-top:20px}
+  .fact{padding:12px}
+  .fact b{font-size:26px}
+  .chip{padding:9px 12px;min-height:40px}
+  .chips{gap:8px}
+  .reset{padding:10px 0}
+  .sitka-about{padding:4px 12px 14px}
+  .panel h2{font-size:19px;flex-wrap:wrap}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
