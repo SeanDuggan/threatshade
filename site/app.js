@@ -8,6 +8,7 @@
   "use strict";
 
   var DATA_URL = "data/data.json";
+  var MAP_URL = "data/ireland-map.json";
   var ALLOWED_LINK_HOSTS = [
     "epa.ie", "irishtimes.com", "irishexaminer.com", "smartwatermagazine.com",
     "sustainabilityonline.net", "farmersjournal.ie", "donegallive.ie",
@@ -98,36 +99,80 @@
     return d;
   }
 
-  /* ---------- map geometry (hand-traced outline, approximate) ---------- */
-  var COAST = [[-7.37,55.38],[-7.03,55.20],[-6.95,55.17],[-6.65,55.21],[-6.15,55.23],[-6.04,55.08],[-5.80,54.86],[-5.70,54.80],[-5.82,54.72],[-5.92,54.63],[-5.67,54.67],[-5.53,54.64],[-5.44,54.46],[-5.47,54.33],[-5.61,54.26],[-5.66,54.22],[-5.89,54.21],[-5.90,54.10],[-6.00,54.06],[-6.07,54.02],[-6.19,54.04],[-6.15,53.98],[-6.38,54.00],[-6.24,53.86],[-6.22,53.79],[-6.25,53.72],[-6.18,53.61],[-6.10,53.58],[-6.09,53.52],[-6.15,53.45],[-6.04,53.37],[-6.20,53.34],[-6.09,53.27],[-6.09,53.20],[-6.06,53.14],[-5.99,52.96],[-6.13,52.80],[-6.22,52.64],[-6.20,52.56],[-6.33,52.35],[-6.40,52.34],[-6.34,52.25],[-6.36,52.17],[-6.59,52.17],[-6.79,52.21],[-6.93,52.12],[-6.98,52.25],[-6.99,52.15],[-7.15,52.16],[-7.54,52.05],[-7.62,52.08],[-7.72,51.95],[-7.85,51.95],[-8.00,51.83],[-8.25,51.79],[-8.32,51.75],[-8.53,51.60],[-8.71,51.62],[-8.95,51.53],[-9.10,51.55],[-9.37,51.48],[-9.82,51.45],[-9.60,51.62],[-9.85,51.55],[-9.45,51.68],[-10.15,51.58],[-9.60,51.87],[-10.35,51.90],[-9.80,52.10],[-10.48,52.10],[-10.15,52.27],[-9.75,52.27],[-9.93,52.42],[-9.67,52.52],[-9.37,52.58],[-9.10,52.62],[-8.63,52.66],[-9.10,52.67],[-9.48,52.63],[-9.93,52.56],[-9.65,52.68],[-9.44,52.85],[-9.43,53.00],[-9.27,53.15],[-8.93,53.14],[-9.05,53.27],[-9.30,53.24],[-9.85,53.32],[-10.23,53.40],[-10.02,53.49],[-9.85,53.61],[-9.80,53.76],[-9.53,53.80],[-10.00,53.90],[-10.25,53.97],[-10.10,54.22],[-9.83,54.34],[-9.35,54.32],[-9.22,54.21],[-8.96,54.29],[-8.47,54.27],[-8.45,54.47],[-8.28,54.48],[-8.11,54.65],[-8.46,54.57],[-8.44,54.63],[-8.79,54.65],[-8.75,54.71],[-8.45,54.77],[-8.56,54.82],[-8.43,54.98],[-8.28,55.15],[-7.98,55.22],[-7.63,55.27],[-7.55,55.25],[-7.53,55.09],[-7.45,55.13],[-7.45,55.28]];
-  var BORDER = [[-7.25,55.05],[-7.32,54.99],[-7.47,54.83],[-7.70,54.70],[-7.83,54.55],[-8.09,54.48],[-8.17,54.43],[-7.88,54.29],[-7.55,54.12],[-7.23,54.18],[-7.05,54.25],[-6.97,54.40],[-6.85,54.29],[-6.65,54.15],[-6.61,54.07],[-6.42,54.05],[-6.30,54.10],[-6.27,54.07]];
-  var LON0 = -10.75, LAT0 = 55.55, K = 150, CX = Math.cos(53.4 * Math.PI / 180);
-  function proj(lng, lat) { return [(lng - LON0) * CX * K + 10, (LAT0 - lat) * K + 10]; }
-  var W = Math.round((-5.25 - LON0) * CX * K + 20), H = Math.round((LAT0 - 51.30) * K + 20);
+  /* ---------- map geometry: MapSVG Ireland (CC0), see data/ireland-map.json ---------- */
+  var MAP = null, W = 0, H = 0, AREAS = [];
+  function merc(lat) { return Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)); }
+  function proj(lng, lat) {
+    var g = MAP.geo_bounds;
+    return [(lng - g.west) / (g.east - g.west) * W,
+            (merc(g.north) - merc(lat)) / (merc(g.north) - merc(g.south)) * H];
+  }
+  function decodeRing(str, unit) {
+    var n = str.split(",").map(Number), pts = [], x = 0, y = 0;
+    for (var i = 0; i + 1 < n.length; i += 2) {
+      if (i === 0) { x = n[0]; y = n[1]; } else { x += n[i]; y += n[i + 1]; }
+      pts.push([x * unit, y * unit]);
+    }
+    return pts;
+  }
+  function inRing(x, y, pts) {
+    var inside = false;
+    for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      var xi = pts[i][0], yi = pts[i][1], xj = pts[j][0], yj = pts[j][1];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+  function areaAt(lng, lat) {
+    var xy = proj(lng, lat);
+    for (var i = 0; i < AREAS.length; i++) {
+      if (AREAS[i].rings.some(function (r) { return inRing(xy[0], xy[1], r); })) return AREAS[i];
+    }
+    return null;
+  }
+  function checkMap(m) {
+    if (!m || !Array.isArray(m.areas) || !num(m.width, 100, 2000) || !num(m.height, 100, 2000) || !num(m.unit, 0.01, 1)) throw new Error("bad map");
+    m.areas.forEach(function (a) {
+      if (!/^(IE-[A-Z]{1,2}|GB-NIR)$/.test(a.id) || typeof a.name !== "string") throw new Error("bad area");
+      a.rings.forEach(function (r) { if (!/^-?\d{1,5}(,-?\d{1,5})*$/.test(r)) throw new Error("bad ring"); });
+    });
+    return m;
+  }
 
   /* ---------- app ---------- */
-  var P = [], SOURCES = {}, sectorFilter = "All", selected = null;
-  var svg, markers, tip, board, rowEls = {};
+  var P = [], SOURCES = {}, sectorFilter = "All", countyFilter = null, selected = null;
+  var svg, markers, tip, board, rowEls = {}, countyEls = {};
 
   function drawBaseMap() {
     svg = document.getElementById("map");
-    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("viewBox", "-6 -6 " + (W + 12).toFixed(0) + " " + (H + 12).toFixed(0));
     var grid = s("g", { "class": "sea-grid" }, svg);
     for (var lat = 52; lat <= 55; lat++) {
-      var y = proj(0, lat)[1];
-      s("line", { x1: 0, x2: W, y1: y, y2: y }, grid);
-      s("text", { x: 4, y: y - 3, "class": "grid-label" }, grid).textContent = lat + "°N";
+      var y = proj(-8, lat)[1];
+      s("line", { x1: -6, x2: W + 6, y1: y, y2: y }, grid);
+      s("text", { x: -2, y: y - 3, "class": "grid-label" }, grid).textContent = lat + "°N";
     }
     for (var lng = -10; lng <= -6; lng++) {
-      var x = proj(lng, 0)[0];
-      s("line", { x1: x, x2: x, y1: 0, y2: H }, grid);
-      s("text", { x: x + 3, y: H - 6, "class": "grid-label" }, grid).textContent = Math.abs(lng) + "°W";
+      var x = proj(lng, 53)[0];
+      s("line", { x1: x, x2: x, y1: -6, y2: H + 6 }, grid);
+      s("text", { x: x + 3, y: H + 2, "class": "grid-label" }, grid).textContent = Math.abs(lng) + "°W";
     }
-    function path(pts, close) { return "M" + pts.map(function (c) { return proj(c[0], c[1]).map(function (v) { return v.toFixed(1); }).join(","); }).join("L") + (close ? "Z" : ""); }
-    s("path", { "class": "island", d: path(COAST, true) }, svg);
-    s("path", { "class": "border", d: path(BORDER, false) }, svg);
-    var nl = proj(-6.75, 54.68);
-    s("text", { x: nl[0], y: nl[1], "class": "ni-label", "text-anchor": "middle" }, svg).textContent = "N. IRELAND";
+    var land = s("g", { "class": "counties" }, svg);
+    AREAS.forEach(function (a) {
+      var d = a.rings.map(function (r) { return "M" + r.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join("L") + "Z"; }).join("");
+      var ni = a.id === "GB-NIR";
+      var el = s("path", { "class": "county" + (ni ? " ni" : ""), d: d }, land);
+      s("title", {}, el).textContent = a.name;
+      if (!ni) {
+        el.setAttribute("tabindex", "0");
+        el.setAttribute("role", "button");
+        el.addEventListener("click", function () { setCounty(countyFilter === a.id ? null : a.id); });
+        el.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setCounty(countyFilter === a.id ? null : a.id); } });
+        countyEls[a.id] = el;
+      }
+    });
+    var ni = AREAS.filter(function (a) { return a.id === "GB-NIR"; })[0];
+    if (ni) { var c = proj(-6.75, 54.62); s("text", { x: c[0], y: c[1], "class": "ni-label", "text-anchor": "middle" }, svg).textContent = "N. IRELAND"; }
     markers = s("g", {}, svg);
     tip = document.getElementById("tip");
 
@@ -135,15 +180,45 @@
     [["Critical 50+", "crit"], ["High 35–49", "high"], ["Elevated 22–34", "elev"], ["Watch <22", "watch"]].forEach(function (l) {
       legend.appendChild(h("span", null, [h("i", { "class": "bg-" + l[1] }), l[0]]));
     });
+    legend.appendChild(h("span", { "class": "legend-note", text: "County shading = worst score in that county. Click a county to filter." }));
+  }
+
+  function inCounty(p) { return !countyFilter || p.counties.indexOf(countyFilter) >= 0; }
+  function visible(p) { return (sectorFilter === "All" || p.sector === sectorFilter) && inCounty(p); }
+
+  function shadeCounties() {
+    Object.keys(countyEls).forEach(function (id) {
+      var worst = -1, n = 0;
+      P.forEach(function (p) { if (p.counties.indexOf(id) >= 0 && (sectorFilter === "All" || p.sector === sectorFilter)) { n++; worst = Math.max(worst, scoreOf(p)); } });
+      var el = countyEls[id], name = AREAS.filter(function (a) { return a.id === id; })[0].name;
+      el.setAttribute("class", "county" + (worst >= 0 ? " heat-" + tierOf(worst)[1] : "") + (countyFilter === id ? " active" : ""));
+      el.setAttribute("aria-label", name + (n ? ": " + n + " polluter" + (n > 1 ? "s" : "") + ", worst score " + Math.round(worst) : ": no polluters listed") + (countyFilter === id ? ", selected" : ""));
+      el.setAttribute("aria-pressed", String(countyFilter === id));
+    });
+  }
+
+  function setCounty(id) {
+    countyFilter = id;
+    var box = document.getElementById("countyfilter"); clear(box);
+    if (id) {
+      var name = AREAS.filter(function (a) { return a.id === id; })[0].name;
+      var b = h("button", { type: "button", "class": "chip county-chip", "aria-pressed": "true", text: "Co. " + name + " ✕" });
+      b.setAttribute("aria-label", "Clear county filter (" + name + ")");
+      b.addEventListener("click", function () { setCounty(null); });
+      box.appendChild(b);
+      var first = P.filter(visible).sort(function (a, b) { return scoreOf(b) - scoreOf(a); })[0];
+      if (first) selected = first.id;
+    }
+    render();
   }
 
   function drawMarkers() {
     clear(markers);
     P.slice().sort(function (a, b) { return scoreOf(a) - scoreOf(b); }).forEach(function (p) {
       var sc = scoreOf(p), t = tierOf(sc), col = tierColor(t[1]);
-      var dim = sectorFilter !== "All" && p.sector !== sectorFilter;
+      var dim = !visible(p);
       p.sites.forEach(function (site, i) {
-        var xy = proj(site.lng, site.lat), r = 3 + sc / 9;
+        var xy = proj(site.lng, site.lat), r = (3 + sc / 9) * 1.15;
         var g = s("g", { "class": "marker " + t[1] + (dim ? " dim" : "") + (p.id === selected ? " sel" : ""), tabindex: dim ? -1 : 0, role: "button", "aria-label": p.name + ", " + site.name + ", score " + Math.round(sc) }, markers);
         s("circle", { "class": "ring", cx: xy[0], cy: xy[1], r: r, stroke: col }, g);
         s("circle", { "class": "dot", cx: xy[0], cy: xy[1], r: r, fill: col }, g);
@@ -204,10 +279,10 @@
   function renderBoard() {
     var first = {};
     Object.keys(rowEls).forEach(function (id) { if (rowEls[id].parentNode) first[id] = rowEls[id].getBoundingClientRect().top; });
-    var list = P.filter(function (p) { return sectorFilter === "All" || p.sector === sectorFilter; })
+    var list = P.filter(visible)
       .sort(function (a, b) { return scoreOf(b) - scoreOf(a); });
     clear(board);
-    if (!list.length) board.appendChild(h("li", { "class": "empty", text: "No polluters in this sector." }));
+    if (!list.length) board.appendChild(h("li", { "class": "empty", text: "No polluters match these filters." }));
     list.forEach(function (p, i) {
       var sc = scoreOf(p), t = tierOf(sc), li = rowEls[p.id];
       li.setAttribute("aria-selected", String(p.id === selected));
@@ -268,12 +343,16 @@
   }
 
   function select(id) { selected = id; render(); }
-  function render() { renderBoard(); drawMarkers(); renderDossier(); }
+  function render() { renderBoard(); shadeCounties(); drawMarkers(); renderDossier(); }
 
-  function start(d) {
+  function start(d, m) {
     checkData(d);
+    MAP = checkMap(m); W = MAP.width; H = MAP.height;
+    AREAS = MAP.areas.map(function (a) { return { id: a.id, name: a.name, rings: a.rings.map(function (r) { return decodeRing(r, MAP.unit); }) }; });
     d.sources.forEach(function (x) { SOURCES[x.id] = x; });
     P = d.polluters.map(function (p) {
+      p.counties = [];
+      p.sites.forEach(function (x) { var a = areaAt(x.lng, x.lat); if (a && p.counties.indexOf(a.id) < 0) p.counties.push(a.id); });
       p.pts = { climate: climatePts(p.co2_tonnes), water: p.points.water, air: p.points.air, enforce: enforcePts(p.enforcement), habitat: p.points.habitat };
       return p;
     });
@@ -290,8 +369,8 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    fetch(DATA_URL, { credentials: "same-origin" })
-      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-      .then(start).catch(fail);
+    function get(url) { return fetch(url, { credentials: "same-origin" }).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }); }
+    Promise.all([get(DATA_URL), get(MAP_URL)])
+      .then(function (res) { start(res[0], res[1]); }).catch(fail);
   });
 })();

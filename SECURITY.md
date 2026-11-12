@@ -10,6 +10,7 @@ Please report security issues privately using GitHub's "Report a vulnerability" 
 - Static files only: no server-side code, database, authentication, cookies, forms or user input.
 - All data is rendered with `textContent` and DOM APIs. A test fails the build if `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write` or `eval(` appear in `app.js`.
 - Strict Content-Security-Policy in `site/_headers`: scripts and data only from the site's own origin, no inline scripts or styles, no framing, no form posts, no plugins.
+- The county map is third-party geometry (MapSVG, CC0). It is converted to integer outlines at build time and never inserted as SVG markup. The validator and the app both reject anything other than ids, names and integer rings, and `build_map.py` refuses DOCTYPE/ENTITY declarations and any path command other than move, line and close.
 - Source links are allowed only if they are `https://` and on the host allowlist. This is checked in the pipeline and again in the browser.
 - HSTS, `nosniff`, `X-Frame-Options: DENY`, a strict referrer policy, a restrictive Permissions-Policy and same-origin COOP/CORP.
 

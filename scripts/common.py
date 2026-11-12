@@ -91,3 +91,51 @@ def names_match(a: str, b: str) -> bool:
     if not na or not nb:
         return False
     return na == nb or na.startswith(nb + " ") or nb.startswith(na + " ")
+
+
+# ---- county map (site/data/ireland-map.json) ----
+MAP_PATH = ROOT / "site" / "data" / "ireland-map.json"
+RING_RE = re.compile(r"^-?\d{1,5}(,-?\d{1,5})*$")
+
+
+def decode_ring(ring: str, unit: float) -> list[tuple[float, float]]:
+    """Delta-encoded integer ring -> list of (x, y) in SVG pixels."""
+    nums = [int(v) for v in ring.split(",")]
+    pts, x, y = [], 0, 0
+    for i in range(0, len(nums) - 1, 2):
+        x, y = (nums[i], nums[i + 1]) if i == 0 else (x + nums[i], y + nums[i + 1])
+        pts.append((x * unit, y * unit))
+    return pts
+
+
+def _merc(lat: float) -> float:
+    return math.log(math.tan(math.pi / 4 + math.radians(lat) / 2))
+
+
+def project(m: dict, lat: float, lng: float) -> tuple[float, float]:
+    """Lat/lng -> SVG pixels. The MapSVG file is Web Mercator within its geo bounds
+    (checked against 33 towns: all inland ones land in the right county). Mirrors projFor() in app.js."""
+    g = m["geo_bounds"]
+    x = (lng - g["west"]) / (g["east"] - g["west"]) * m["width"]
+    y = (_merc(g["north"]) - _merc(lat)) / (_merc(g["north"]) - _merc(g["south"])) * m["height"]
+    return x, y
+
+
+def point_in_ring(x: float, y: float, pts) -> bool:
+    inside, j = False, len(pts) - 1
+    for i in range(len(pts)):
+        xi, yi = pts[i]
+        xj, yj = pts[j]
+        if (yi > y) != (yj > y) and x < (xj - xi) * (y - yi) / (yj - yi) + xi:
+            inside = not inside
+        j = i
+    return inside
+
+
+def area_at(m: dict, lat: float, lng: float):
+    """Return the area (county) dict containing the point, or None (e.g. offshore)."""
+    x, y = project(m, lat, lng)
+    for a in m["areas"]:
+        if any(point_in_ring(x, y, decode_ring(r, m["unit"])) for r in a["rings"]):
+            return a
+    return None

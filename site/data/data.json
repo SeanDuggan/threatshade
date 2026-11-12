@@ -209,9 +209,9 @@
           "lng": -9.76
         },
         {
-          "name": "Glenaboy River, near Tallow, Co Cork",
+          "name": "Glenaboy River, Co Cork (approx.)",
           "lat": 52.1,
-          "lng": -8.02
+          "lng": -8.1
         },
         {
           "name": "Drumwood, Rossmore, Co Tipperary (approx.)",
@@ -301,8 +301,8 @@
         },
         {
           "name": "Kellysgrove, east Galway (approx.)",
-          "lat": 53.3,
-          "lng": -8.08
+          "lat": 53.28,
+          "lng": -8.22
         }
       ],
       "evidence": [
@@ -649,8 +649,8 @@
       "sites": [
         {
           "name": "Moneypoint, Co Clare",
-          "lat": 52.606,
-          "lng": -9.419
+          "lat": 52.612,
+          "lng": -9.425
         },
         {
           "name": "Poolbeg & Ringsend, Dublin",
