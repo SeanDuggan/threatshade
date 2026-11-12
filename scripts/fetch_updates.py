@@ -27,7 +27,7 @@ import urllib.request
 from html.parser import HTMLParser
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
-from common import DATA_PATH, REPORT_PATH, STATE_DIR, allowlist, host_allowed, load_json, names_match, write_json  # noqa: E402
+from common import DATA_PATH, REPORT_PATH, STATE_DIR, allowlist, host_allowed, load_json, match_kind, names_match, write_json  # noqa: E402
 
 NPS_URL = "https://www.epa.ie/our-services/compliance--enforcement/whats-happening/national-priority-sites-list"
 PROS_URL = "https://www.epa.ie/our-services/compliance--enforcement/whats-happening/prosecutions-and-penalties/prosecutions-{year}/"
@@ -47,6 +47,24 @@ report: list[str] = []
 def say(line: str = "") -> None:
     print(line)
     report.append(line)
+
+
+def md_text(text) -> str:
+    """Show fetched (untrusted) text literally in the Markdown report, which becomes the PR body.
+
+    Inside a code span GitHub renders no links, images, HTML or @mentions. Backticks and
+    line breaks are removed so the text cannot close the span early.
+    """
+    t = re.sub(r"[\s`]+", " ", str(text)).strip()[:300]
+    return f"`{t}`" if t else "`(blank)`"
+
+
+_SAFE_URL = re.compile(r"https://(www\.)?epa\.ie/[A-Za-z0-9._~/%-]*")
+
+
+def md_url(url: str) -> str:
+    """A clickable link only for plain epa.ie URLs; anything else is shown as literal text."""
+    return f"<{url}>" if _SAFE_URL.fullmatch(url) else md_text(url)
 
 
 class _AllowlistRedirects(urllib.request.HTTPRedirectHandler):
@@ -127,7 +145,7 @@ def step_priority_sites(data: dict) -> bool:
     try:
         nps = parse_nps(fetch(NPS_URL, "text/html").decode("utf-8", "replace"))
     except Exception as e:  # noqa: BLE001 - report and skip, never crash the whole run
-        say(f"- SKIPPED: could not fetch or parse the list ({type(e).__name__}: {e})")
+        say(f"- SKIPPED: could not fetch or parse the list ({type(e).__name__}: {md_text(e)})")
         return False
     n = len(nps["sites"])
     if not (1 <= n <= 40):
@@ -137,18 +155,29 @@ def step_priority_sites(data: dict) -> bool:
     say(f"- List found: {nps['quarter'] or 'quarter not detected'}, {n} sites.")
 
     changed = False
-    listed = [s["licensee"] for s in nps["sites"]]
     for p in data["polluters"]:
-        on_list = any(names_match(p["name"], l) for l in listed)
+        kinds = [k for k in (match_kind(p["name"], s["licensee"]) for s in nps["sites"]) if k]
         cur = p["enforcement"].get("nps")
-        new = "current" if on_list else ("past" if cur == "current" else cur)
+        if "exact" in kinds:
+            new = "current"
+        elif kinds:
+            # Only a loose match: never change a public claim automatically, in either direction.
+            for s in nps["sites"]:
+                if match_kind(p["name"], s["licensee"]):
+                    say(f"- POSSIBLE MATCH, not applied (status stays {cur}): board entry {md_text(p['name'])} "
+                        f"may be listed site {md_text(s['licensee'])} ({md_text(s['county'])}). "
+                        "Check it is the same site, then edit by hand.")
+            continue
+        else:
+            new = "past" if cur == "current" else cur
         if new != cur:
-            say(f"- CHANGED: {p['name']} priority status {cur} -> {new}")
+            say(f"- CHANGED: {md_text(p['name'])} priority status {cur} -> {new}")
             p["enforcement"]["nps"] = new
             changed = True
     for s in nps["sites"]:
         if not any(names_match(p["name"], s["licensee"]) for p in data["polluters"]):
-            say(f"- NEW ON LIST, not on scoreboard: {s['licensee']} ({s['county']}, {s['sector']}): {s['issue']}. Add by hand with sources if appropriate.")
+            say(f"- NEW ON LIST, not on scoreboard: {md_text(s['licensee'])} ({md_text(s['county'])}, "
+                f"{md_text(s['sector'])}): {md_text(s['issue'])}. Add by hand with sources if appropriate.")
     if not changed:
         say("- No status changes for polluters already on the board.")
     return changed
@@ -189,7 +218,7 @@ def step_prosecutions() -> None:
             lp = _LinkParser()
             lp.feed(fetch(url, "text/html").decode("utf-8", "replace"))
         except Exception as e:  # noqa: BLE001
-            say(f"- SKIPPED {y}: {type(e).__name__}: {e}")
+            say(f"- SKIPPED {y}: {type(e).__name__}: {md_text(e)}")
             continue
         for href, text in lp.links:
             full = urllib.parse.urljoin(url, href)
@@ -207,7 +236,7 @@ def step_prosecutions() -> None:
         say(f"- First run: recorded {len(new)} existing prosecutions as the baseline.")
     elif new:
         for text, url in new:
-            say(f"- NEW: {text} <{url}>. Read it, then update the polluter's evidence and prosecutions count by hand.")
+            say(f"- NEW: {md_text(text)} {md_url(url)}. Read it, then update the polluter's evidence and prosecutions count by hand.")
     else:
         say("- No new prosecutions.")
 

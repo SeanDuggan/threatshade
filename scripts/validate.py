@@ -178,11 +178,11 @@ def load_baseline(args):
     if args.baseline:
         return load_json(args.baseline)
     if args.baseline_ref:
-        if not re.match(r"^[A-Za-z0-9._/-]{1,100}$", args.baseline_ref):
+        if not re.match(r"^[A-Za-z0-9._][A-Za-z0-9._/-]{0,99}$", args.baseline_ref):  # no leading "-": git would read it as an option
             raise SystemExit("invalid --baseline-ref")
         rel = DATA_PATH.relative_to(ROOT).as_posix()
         out = subprocess.run(["git", "show", f"{args.baseline_ref}:{rel}"], cwd=ROOT,
-                             capture_output=True, text=True, check=False)
+                             capture_output=True, text=True, encoding="utf-8", check=False)
         if out.returncode != 0:
             return None
         return json.loads(out.stdout)

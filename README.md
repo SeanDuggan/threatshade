@@ -13,6 +13,7 @@ site/                    What gets deployed (Cloudflare Pages output directory)
   app.js                 Scoring, map and scoreboard; renders data with DOM APIs only
   data/data.json         The polluters, scores inputs, evidence and sources
   assets/logo.jpg        Threatshade logo
+  assets/fonts/          Self-hosted fonts (woff2) and their OFL licences
   _headers               Security headers for Cloudflare Pages (CSP, HSTS, etc.)
   .well-known/security.txt  Security contact (RFC 9116); renew Expires yearly
   security-policy.txt    Vulnerability disclosure policy
@@ -69,7 +70,7 @@ Then in the repository settings:
 - **Branch protection on `main`:** require a pull request, require the `validate` check, require review from Code Owners, block force pushes.
 - **Actions > General:** workflow permissions "Read repository contents"; allow GitHub Actions to create pull requests (needed for the weekly PR).
 - **Security:** turn on Dependabot alerts and secret scanning. Use two-factor authentication on the account.
-- Note: pull requests opened with the built-in token do not trigger other workflows, so the weekly job runs the tests and validation itself before opening the PR.
+- Note: pull requests opened with the built-in token do not trigger other workflows. The weekly job runs the tests and validation itself, then starts the `validate` workflow on its branch (`workflow_dispatch`) so the required `test` check appears on the weekly PR.
 
 ## Deploy to Cloudflare Pages (after the threat model)
 
@@ -82,5 +83,4 @@ Then in the repository settings:
 
 - Get legal advice on naming companies. Every claim must stay tied to a source, and the method and disclaimer must stay on the page.
 - Verify the pinned GitHub Action commit (`actions/checkout`, pinned to the v4.2.2 commit) against the official release page. Dependabot will propose updates.
-- Self-host the fonts, then remove the Google Fonts hosts from the CSP in `site/_headers`.
 - Add a licence file if you want others to reuse the code or data.

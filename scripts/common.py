@@ -87,7 +87,26 @@ def norm_name(s: str) -> str:
 
 
 def names_match(a: str, b: str) -> bool:
+    """Loose match: same name, or one name is the start of the other. Used only to decide
+    whether a listed site is already covered by the board (for reporting), never to change data."""
     na, nb = norm_name(a), norm_name(b)
     if not na or not nb:
         return False
     return na == nb or na.startswith(nb + " ") or nb.startswith(na + " ")
+
+
+def match_kind(board_name: str, listed_name: str) -> str | None:
+    """How confidently a board entry matches a name on an EPA list.
+
+    "exact":    same name after normalising, and the board name has no "(...)" qualifier.
+                Only this is safe to act on automatically.
+    "possible": a loose match, or the board entry is qualified to one site or owner
+                (e.g. "Kingspan (Kingscourt)"), so a different site of the same company could
+                be the one listed. A human must check.
+    None:       no match.
+    """
+    if not names_match(board_name, listed_name):
+        return None
+    if norm_name(board_name) == norm_name(listed_name) and "(" not in board_name:
+        return "exact"
+    return "possible"

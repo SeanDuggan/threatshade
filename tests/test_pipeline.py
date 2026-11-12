@@ -51,6 +51,13 @@ class DataFile(unittest.TestCase):
         self.assertNotIn("style=", html)
         self.assertNotIn("<style", html)
 
+    def test_no_third_party_hosts_in_page_or_csp(self):
+        html = (ROOT / "site/index.html").read_text(encoding="utf-8")
+        self.assertIsNone(re.search(r'<(link|script)[^>]+(href|src)="https?://', html))
+        csp = next(l for l in (ROOT / "site/_headers").read_text(encoding="utf-8").splitlines()
+                   if "Content-Security-Policy" in l)
+        self.assertNotIn("https://", csp)
+
     def test_no_markdown_in_published_site(self):
         # site/ is the Cloudflare Pages output directory; repo docs must never be published.
         found = [str(p.relative_to(ROOT)) for p in (ROOT / "site").rglob("*")
@@ -106,6 +113,31 @@ class Fetching(unittest.TestCase):
     def test_name_matching(self):
         self.assertTrue(common.names_match("North Cork Co-Op Creameries", "North Cork Co-Op Creameries Limited"))
         self.assertTrue(common.names_match("Kingspan (Kingscourt)", "Kingspan Building Products"))
+
+    def test_only_exact_unqualified_names_change_status(self):
+        self.assertEqual(common.match_kind("North Cork Co-Op Creameries", "North Cork Co-Op Creameries Limited"), "exact")
+        # A different site of the same company must not be applied automatically.
+        self.assertEqual(common.match_kind("Kingspan (Kingscourt)", "Kingspan Insulation Ltd"), "possible")
+        self.assertEqual(common.match_kind("Kingspan (Kingscourt)", "Kingspan Limited"), "possible")
+        self.assertEqual(common.match_kind("Kerry Ingredients", "Kerry Ingredients Listowel"), "possible")
+        self.assertIsNone(common.match_kind("ESB power stations", "Arrow Group"))
+
+    def test_possible_match_does_not_change_published_status(self):
+        d = data()
+        k = by_id(d, "kingspan"); k["enforcement"]["nps"] = None
+        listing = {"quarter": "Q2 2026", "sites": [
+            {"licensee": "Kingspan Insulation Limited", "county": "Meath", "sector": "x", "issue": "y"}]}
+        orig = fetch_updates.parse_nps, fetch_updates.fetch, fetch_updates.write_json
+        try:
+            fetch_updates.parse_nps = lambda html: listing
+            fetch_updates.fetch = lambda url, accept: b""
+            fetch_updates.write_json = lambda path, obj: None
+            fetch_updates.report.clear()
+            fetch_updates.step_priority_sites(d)
+        finally:
+            fetch_updates.parse_nps, fetch_updates.fetch, fetch_updates.write_json = orig
+        self.assertIsNone(k["enforcement"]["nps"])
+        self.assertTrue(any("POSSIBLE MATCH" in line for line in fetch_updates.report))
         self.assertTrue(common.names_match("Tipperary Co-op Creamery", "Tipperary Co-operative Creamery Limited"))
         self.assertFalse(common.names_match("Kerry Ingredients", "Kerry Dairy Ireland"))
         self.assertFalse(common.names_match("ESB power stations", "Arrow Group"))
@@ -114,6 +146,20 @@ class Fetching(unittest.TestCase):
         for url in ("https://evil.example/", "http://www.epa.ie/", "https://www.epa.ie.evil.com/"):
             with self.assertRaises(ValueError):
                 fetch_updates.fetch(url, "text/html")
+
+    def test_report_shows_fetched_text_literally(self):
+        evil = "Acme [click here](https://evil.example) ![x](https://evil.example/p.png) @someone `x`\n# heading"
+        out = fetch_updates.md_text(evil)
+        self.assertTrue(out.startswith("`") and out.endswith("`"))
+        self.assertEqual(out.count("`"), 2)
+        self.assertNotIn("\n", out)
+        self.assertEqual(fetch_updates.md_url("https://www.epa.ie/a/prosecutions-2026/epa-prosecutes-x/"),
+                         "<https://www.epa.ie/a/prosecutions-2026/epa-prosecutes-x/>")
+        self.assertTrue(fetch_updates.md_url("https://www.epa.ie/x>[y](https://evil.example)").startswith("`"))
+
+    def test_baseline_ref_rejects_option_like_values(self):
+        with self.assertRaises(SystemExit):
+            validate.load_baseline(type("A", (), {"baseline": None, "baseline_ref": "--output=/tmp/x"})())
 
     def test_untrusted_text_from_list_is_caught_by_validator(self):
         d = data()

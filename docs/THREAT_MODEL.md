@@ -35,7 +35,6 @@ flowchart LR
   Dev[Maintainer\nmanual edits and review] -- PR, merge --> GH
   GH -- deploy main --> CF[Cloudflare Pages\nthreatshade.com]
   CF -- static HTML/JS/JSON --> V[Visitors' browsers]
-  V -- fonts --> GF[Google Fonts]
 ```
 
 ## Trust boundaries
@@ -44,7 +43,7 @@ flowchart LR
 2. **GitHub Actions to the repository.** The bot can push a branch and open a PR, but cannot merge to `main` if branch protection is on.
 3. **Repository to production.** Only `main` deploys. Controls: required review, required checks, CODEOWNERS.
 4. **Server to browser.** Visitors get static files. Controls: CSP, no inline code, DOM-only rendering, link allowlist.
-5. **Browser to third parties.** Only Google Fonts today (removable by self-hosting).
+5. **Browser to third parties.** None. Fonts are self-hosted, so visitors only contact the site's own origin.
 
 ## Entry points
 
@@ -62,7 +61,7 @@ flowchart LR
 | 2 | Tampering | A page redesign makes the parser mark everyone "not on the list" | Step skipped if 0 or more than 40 rows; status changes are flagged in the PR | Add a minimum-overlap check with last week's list? |
 | 3 | Spoofing | Takeover of the GitHub or Cloudflare account | 2FA (to enable), branch protection | Hardware keys? Separate Cloudflare account with least privilege? |
 | 4 | Elevation | Workflow injection or token misuse | Least-privilege permissions, no secrets, pinned actions, env-var passing, no `pull_request_target` | Restrict Actions to GitHub-owned actions only in repo settings? |
-| 5 | Tampering | Supply chain (a compromised GitHub Action, Google Fonts) | SHA pinning, Dependabot, stdlib-only scripts | Self-host fonts to remove the last third-party request |
+| 5 | Tampering | Supply chain (a compromised GitHub Action) | SHA pinning, Dependabot, stdlib-only scripts, self-hosted fonts | Restrict Actions to GitHub-owned actions only? |
 | 6 | Repudiation | Unclear who changed a score and why | Git history, PR review, evidence entries with sources | Signed commits? Public changelog page? |
 | 7 | Information disclosure | Personal data in the repo or site (emails, private individuals) | Only organisations are listed; no analytics | Policy for sole traders or small farms appearing in EPA lists |
 | 8 | Denial of service | Takedown pressure or traffic floods from listed organisations | Cloudflare edge caching | Legal takedown process; backup hosting |

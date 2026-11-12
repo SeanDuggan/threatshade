@@ -20,6 +20,7 @@ jobs:
     permissions:
       contents: write        # push the update branch
       pull-requests: write   # open the pull request
+      actions: write         # start the validate workflow on the new branch
     steps:
       - name: Check out (credentials not stored in .git/config)
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -40,7 +41,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          if git diff --quiet -- site/data data/state; then
+          # git status (not git diff) so new, untracked state files count as a change.
+          # Otherwise the baseline in data/state is never saved and new prosecutions are never reported.
+          if [ -z "$(git status --porcelain --untracked-files=all -- site/data data/state)" ]; then
             echo "No data changes this week."
             cat reports/update-report.md >> "$GITHUB_STEP_SUMMARY"
             exit 0
@@ -56,3 +59,5 @@ jobs:
           gh pr create --base main --head "$branch" \
             --title "Weekly data refresh $(date -u +%F)" \
             --body-file reports/update-report.md
+          # The PR above does not trigger the validate workflow, so start it on the branch.
+          gh workflow run validate-pr.yml --ref "$branch"

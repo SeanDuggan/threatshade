@@ -1,4 +1,7 @@
 # Runs on every pull request and push to main. Read-only.
+# Also runs on workflow_dispatch: the weekly job starts it on its own branch, because pull requests
+# opened with the built-in token do not trigger other workflows. The run reports the same "test"
+# check on the branch's commit, so branch protection can require it.
 name: validate
 
 on:
@@ -6,6 +9,7 @@ on:
     branches: [main]
   push:
     branches: [main]
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -28,6 +32,8 @@ jobs:
         run: |
           if [ "$EVENT_NAME" = "pull_request" ]; then
             python3 scripts/validate.py --baseline-ref "origin/$BASE_REF"
+          elif [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            python3 scripts/validate.py --baseline-ref origin/main
           else
             python3 scripts/validate.py
           fi
