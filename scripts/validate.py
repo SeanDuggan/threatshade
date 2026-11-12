@@ -9,7 +9,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
-from common import (DATA_PATH, MAP_PATH, REPORT_PATH, RING_RE, ROOT, allowlist, area_at,
+from common import (DATA_PATH, MAP_PATH, REPORT_PATH, RING_RE, ROOT, SITKA_PATH, allowlist, area_at,
                     decode_ring, host_allowed, load_json, score)
 
 SECTORS = {"Water utility", "Dairy & food", "Chemicals", "Heavy industry", "Power", "Aviation",
@@ -196,6 +196,54 @@ def validate_map(m, r: Result | None = None) -> Result:
     return r
 
 
+SITKA_MAX_BYTES = 200_000
+SITKA_CELL_MAX_HA = 3000
+
+
+def validate_sitka(g, r: Result | None = None) -> Result:
+    r = r or Result()
+    if not isinstance(g, dict):
+        r.err("sitka: top level must be an object")
+        return r
+    allowed = {"version", "species", "source", "source_url", "fetched", "origin", "cell", "plots", "total_ha", "cells"}
+    if set(g) - allowed:
+        r.err(f"sitka: unexpected keys {sorted(set(g) - allowed)}")
+    if g.get("version") != 1:
+        r.err("sitka.version must be 1")
+    _text(r, "sitka.species", g.get("species"), 40)
+    _text(r, "sitka.source", g.get("source"), 120)
+    if not isinstance(g.get("source_url"), str) or not host_allowed(g["source_url"], allowlist()["link_hosts"]):
+        r.err("sitka.source_url: must be https on an allowlisted host")
+    try:
+        dt.date.fromisoformat(str(g.get("fetched")))
+    except ValueError:
+        r.err("sitka.fetched must be an ISO date")
+    o, c = g.get("origin") or {}, g.get("cell") or {}
+    _num(r, "sitka.origin.lat", o.get("lat"), 51, 52)
+    _num(r, "sitka.origin.lng", o.get("lng"), -11, -10)
+    _num(r, "sitka.cell.dlat", c.get("dlat"), 0.01, 0.2)
+    _num(r, "sitka.cell.dlng", c.get("dlng"), 0.01, 0.3)
+    _num(r, "sitka.plots", g.get("plots"), 0, 500_000, integer=True)
+    cells = g.get("cells")
+    if not isinstance(cells, list) or not (1 <= len(cells) <= 8000):
+        r.err("sitka.cells: between 1 and 8000 cells required")
+        return r
+    seen, total = set(), 0
+    for k, cell in enumerate(cells):
+        ok = (isinstance(cell, list) and len(cell) == 3 and all(isinstance(v, int) and not isinstance(v, bool) for v in cell)
+              and 0 <= cell[0] <= 80 and 0 <= cell[1] <= 90 and 1 <= cell[2] <= SITKA_CELL_MAX_HA)
+        if not ok:
+            r.err(f"sitka.cells[{k}]: must be [column 0-80, row 0-90, hectares 1-{SITKA_CELL_MAX_HA}]")
+            continue
+        if (cell[0], cell[1]) in seen:
+            r.err(f"sitka.cells[{k}]: duplicate cell")
+        seen.add((cell[0], cell[1]))
+        total += cell[2]
+    if not r.errors and g.get("total_ha") != total:
+        r.err("sitka.total_ha does not match the sum of the cells")
+    return r
+
+
 def check_sites_on_land(data, m, r: Result) -> Result:
     for p in data.get("polluters", []):
         for s in p.get("sites", []):
@@ -263,6 +311,12 @@ def main(argv=None) -> int:
         validate_map(m, r)
         if not r.errors:
             check_sites_on_land(data, m, r)
+    if not SITKA_PATH.exists():
+        r.err("sitka grid file missing (run scripts/build_sitka.py)")
+    elif len(SITKA_PATH.read_bytes()) > SITKA_MAX_BYTES:
+        r.err("sitka grid file too large")
+    else:
+        validate_sitka(load_json(SITKA_PATH), r)
     base = None if r.errors else load_baseline(args)
     if base is not None:
         compare(base, data, r)

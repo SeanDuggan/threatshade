@@ -170,3 +170,17 @@ footer a{color:#f9f9f9}
 .legend-note{flex-basis:100%;font-size:12px}
 .county-chip{background:var(--text);color:#fff;border-color:var(--text)}
 #countyfilter:empty{display:none}
+#map .sitka{display:none;pointer-events:none}
+#map .sitka.on{display:inline}
+#map .sitka rect,.sitka-swatches i.sw{fill:#1f6b3a;background:#1f6b3a}
+#map .sitka .s1{fill-opacity:.22} .sitka-swatches .s1{opacity:.22}
+#map .sitka .s2{fill-opacity:.38} .sitka-swatches .s2{opacity:.38}
+#map .sitka .s3{fill-opacity:.55} .sitka-swatches .s3{opacity:.55}
+#map .sitka .s4{fill-opacity:.72} .sitka-swatches .s4{opacity:.72}
+#map .sitka .s5{fill-opacity:.88} .sitka-swatches .s5{opacity:.88}
+.sitka-toggle[aria-pressed="true"]{background:#1f6b3a;color:#fff;border-color:#1f6b3a}
+.sitka-key{flex-basis:100%;font-size:12px}
+.sitka-key[hidden]{display:none}
+.sitka-key p{margin:6px 0 0}
+.sitka-swatches{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.sitka-swatches i.sw{display:inline-block;width:12px;height:12px;border-radius:0;margin-right:5px;vertical-align:-2px}

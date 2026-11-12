@@ -2,11 +2,12 @@
   "use strict";
   var DATA_URL = "data/data.json";
   var MAP_URL = "data/ireland-map.json";
+  var SITKA_URL = "data/sitka-grid.json";
   var ALLOWED_LINK_HOSTS = [
     "epa.ie", "irishtimes.com", "irishexaminer.com", "smartwatermagazine.com",
     "sustainabilityonline.net", "farmersjournal.ie", "donegallive.ie",
     "fisheriesireland.ie", "catchments.ie", "agriland.ie", "europa.eu",
-    "bnm.ie", "leinsterexpress.ie"
+    "bnm.ie", "leinsterexpress.ie", "data.gov.ie"
   ];
   var NS = "http://www.w3.org/2000/svg";
   function h(tag, attrs, children) {
@@ -123,7 +124,7 @@
     return m;
   }
   var P = [], SOURCES = {}, sectorFilter = "All", countyFilter = null, selected = null;
-  var svg, markers, tip, board, rowEls = {}, countyEls = {};
+  var svg, markers, tip, board, rowEls = {}, countyEls = {}, sitkaLayer;
   function drawBaseMap() {
     svg = document.getElementById("map");
     svg.setAttribute("viewBox", "-6 -6 " + (W + 12).toFixed(0) + " " + (H + 12).toFixed(0));
@@ -154,6 +155,7 @@
     });
     var ni = AREAS.filter(function (a) { return a.id === "GB-NIR"; })[0];
     if (ni) { var c = proj(-6.75, 54.62); s("text", { x: c[0], y: c[1], "class": "ni-label", "text-anchor": "middle" }, svg).textContent = "N. IRELAND"; }
+    sitkaLayer = s("g", { "class": "sitka", "aria-hidden": "true" }, svg);
     markers = s("g", {}, svg);
     tip = document.getElementById("tip");
     var legend = document.getElementById("legend");
@@ -161,6 +163,44 @@
       legend.appendChild(h("span", null, [h("i", { "class": "bg-" + l[1] }), l[0]]));
     });
     legend.appendChild(h("span", { "class": "legend-note", text: "County shading = worst score in that county. Click a county to filter." }));
+  }
+  var SITKA_STEPS = [50, 200, 500, 1000];
+  function checkSitka(g) {
+    if (!g || !Array.isArray(g.cells) || g.cells.length > 8000 || !g.origin || !g.cell) throw new Error("bad sitka grid");
+    if (!num(g.origin.lat, 51, 52) || !num(g.origin.lng, -11, -10) || !num(g.cell.dlat, 0.01, 0.2) || !num(g.cell.dlng, 0.01, 0.3)) throw new Error("bad sitka grid");
+    g.cells.forEach(function (c) { if (!Array.isArray(c) || !num(c[0], 0, 80) || !num(c[1], 0, 90) || !num(c[2], 1, 3000)) throw new Error("bad sitka cell"); });
+    return g;
+  }
+  function drawSitka(g) {
+    g.cells.forEach(function (c) {
+      var lng0 = g.origin.lng + c[0] * g.cell.dlng, lat0 = g.origin.lat + c[1] * g.cell.dlat;
+      var a = proj(lng0, lat0 + g.cell.dlat), b = proj(lng0 + g.cell.dlng, lat0);
+      var step = SITKA_STEPS.filter(function (t) { return c[2] >= t; }).length + 1;
+      s("rect", { x: a[0].toFixed(1), y: a[1].toFixed(1), width: (b[0] - a[0]).toFixed(1), height: (b[1] - a[1]).toFixed(1), "class": "s" + step }, sitkaLayer);
+    });
+    var legend = document.getElementById("legend");
+    var keyEl = h("div", { "class": "sitka-key", hidden: "hidden" });
+    var swatches = h("span", { "class": "sitka-swatches" }, ["Hectares per square: "]);
+    ["under 50", "50–199", "200–499", "500–999", "1,000+"].forEach(function (label, i) {
+      swatches.appendChild(h("span", null, [h("i", { "class": "sw s" + (i + 1) }), label]));
+    });
+    keyEl.appendChild(swatches);
+    var url = safeUrl(g.source_url);
+    keyEl.appendChild(h("p", null, [
+      "Coillte forest where Sitka spruce is the main species, added up in squares of about 5 km (" + Math.round(g.total_ha).toLocaleString("en-IE") + " ha in total). Private forests are not included yet. Source: ",
+      url ? h("a", { href: url, rel: "noopener noreferrer", text: g.source }) : g.source,
+      ", fetched " + g.fetched + "."
+    ]));
+    var btn = h("button", { type: "button", "class": "chip sitka-toggle", "aria-pressed": "false", text: "Show Sitka spruce plantations" });
+    btn.addEventListener("click", function () {
+      var on = btn.getAttribute("aria-pressed") !== "true";
+      btn.setAttribute("aria-pressed", String(on));
+      btn.textContent = on ? "Hide Sitka spruce plantations" : "Show Sitka spruce plantations";
+      sitkaLayer.setAttribute("class", "sitka" + (on ? " on" : ""));
+      if (on) keyEl.removeAttribute("hidden"); else keyEl.setAttribute("hidden", "hidden");
+    });
+    legend.insertBefore(keyEl, legend.firstChild);
+    legend.insertBefore(btn, legend.firstChild);
   }
   function inCounty(p) { return !countyFilter || p.counties.indexOf(countyFilter) >= 0; }
   function visible(p) { return (sectorFilter === "All" || p.sector === sectorFilter) && inCounty(p); }
@@ -314,7 +354,7 @@
   }
   function select(id) { selected = id; render(); }
   function render() { renderBoard(); shadeCounties(); drawMarkers(); renderDossier(); }
-  function start(d, m) {
+  function start(d, m, sitka) {
     checkData(d);
     MAP = checkMap(m); W = MAP.width; H = MAP.height;
     AREAS = MAP.areas.map(function (a) { return { id: a.id, name: a.name, rings: a.rings.map(function (r) { return decodeRing(r, MAP.unit); }) }; });
@@ -329,6 +369,9 @@
     selected = top ? top.id : null;
     document.getElementById("reviewed").textContent = d.last_reviewed || "unknown";
     drawBaseMap(); buildControls(); buildRows(); renderSources(); render();
+    if (sitka) {
+      try { drawSitka(checkSitka(sitka)); } catch (e) { if (window.console) console.error(e); }
+    }
   }
   function fail(err) {
     var b = document.getElementById("board"); clear(b);
@@ -337,7 +380,7 @@
   }
   document.addEventListener("DOMContentLoaded", function () {
     function get(url) { return fetch(url, { credentials: "same-origin" }).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }); }
-    Promise.all([get(DATA_URL), get(MAP_URL)])
-      .then(function (res) { start(res[0], res[1]); }).catch(fail);
+    Promise.all([get(DATA_URL), get(MAP_URL), get(SITKA_URL).catch(function () { return null; })])
+      .then(function (res) { start(res[0], res[1], res[2]); }).catch(fail);
   });
 })();

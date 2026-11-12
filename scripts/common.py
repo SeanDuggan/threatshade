@@ -12,6 +12,7 @@ DATA_PATH = ROOT / "site" / "data" / "data.json"
 STATE_DIR = ROOT / "data" / "state"
 REPORT_PATH = ROOT / "reports" / "update-report.md"
 ALLOWLIST_PATH = ROOT / "config" / "link_allowlist.json"
+SITKA_PATH = ROOT / "site" / "data" / "sitka-grid.json"
 
 TOP_EMITTER = 12_300_000
 CATS = {"climate": 30, "water": 25, "air": 10, "enforce": 20, "habitat": 15}

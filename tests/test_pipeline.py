@@ -221,3 +221,38 @@ class CountyMap(unittest.TestCase):
             build_map.build('<!DOCTYPE svg [<!ENTITY a "x">]><svg xmlns="http://www.w3.org/2000/svg"/>')
         with self.assertRaises(ValueError):
             build_map.parse_path("M 0,0 C 1,1 2,2 3,3 Z")
+
+
+import build_sitka
+
+
+class SitkaGrid(unittest.TestCase):
+    def sample(self):
+        return build_sitka.grid([(53.01, -8.01, 10.0), (53.02, -8.02, 5.5), (54.5, -7.0, 2.4), (49.0, -8.0, 99.0)])
+
+    def test_grid_adds_up_plots_in_the_same_square(self):
+        g = self.sample()
+        self.assertEqual(g["plots"], 3)
+        self.assertEqual(len(g["cells"]), 2)
+        self.assertEqual(g["total_ha"], 16 + 2)
+        self.assertEqual(validate.validate_sitka(g).errors, [])
+
+    def test_validator_rejects_bad_cells(self):
+        for bad in ([1, 2], [1, 2, 0], [1, 2, 99999], [-1, 2, 5], [1, 2, "5"], [1, 2, True]):
+            g = self.sample()
+            g["cells"].append(bad)
+            self.assertTrue(validate.validate_sitka(g).errors, bad)
+
+    def test_validator_rejects_wrong_total_and_unknown_keys(self):
+        g = self.sample(); g["total_ha"] += 1
+        self.assertTrue(validate.validate_sitka(g).errors)
+        g = self.sample(); g["script"] = "x"
+        self.assertTrue(validate.validate_sitka(g).errors)
+
+    def test_published_grid_is_valid(self):
+        g = common.load_json(common.SITKA_PATH)
+        self.assertEqual(validate.validate_sitka(g).errors, [])
+        self.assertGreater(g["total_ha"], 100_000)
+
+    def test_build_only_contacts_allowlisted_host(self):
+        self.assertTrue(common.host_allowed(build_sitka.LAYER, common.allowlist()["fetch_hosts"]))

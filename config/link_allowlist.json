@@ -12,10 +12,12 @@
     "agriland.ie",
     "europa.eu",
     "bnm.ie",
-    "leinsterexpress.ie"
+    "leinsterexpress.ie",
+    "data.gov.ie"
   ],
   "fetch_hosts": [
     "www.epa.ie",
-    "data.epa.ie"
+    "data.epa.ie",
+    "services7.arcgis.com"
   ]
 }

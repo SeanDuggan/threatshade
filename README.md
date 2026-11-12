@@ -14,6 +14,7 @@ site/                    What gets deployed (Cloudflare Pages output directory)
   app.js                 Scoring, map and scoreboard; renders data with DOM APIs only
   data/data.json         The polluters, scores inputs, evidence and sources
   data/ireland-map.json  County outlines (from the MapSVG Ireland map, CC0), as plain integer rings
+  data/sitka-grid.json   Sitka spruce overlay: Coillte hectares per ~5 km square (CC BY 4.0)
   assets/logo.jpg        Threatshade logo
   assets/fonts/          Self-hosted fonts (woff2) and their OFL licences
   _headers               Security headers for Cloudflare Pages (CSP, HSTS, etc.)
@@ -24,6 +25,7 @@ scripts/
   fetch_updates.py       Weekly fetch from EPA sources (standard library only)
   validate.py            Strict validation of data.json and the map, plus change warnings
   build_map.py           Rebuilds ireland-map.json from the MapSVG source SVG (only when needed)
+  build_sitka.py         Rebuilds sitka-grid.json from Coillte's Forest Inventory service
 config/link_allowlist.json   Hosts that source links and the fetcher may use
 data/state/              What the fetcher saw last time (for change detection)
 tests/                   Unit tests (python3 -m unittest discover -s tests -v)
@@ -57,6 +59,19 @@ County boundaries come from MapSVG's geo-calibrated Ireland map (https://mapsvg.
 To refresh the geometry: download `https://mapsvg.com/maps/geo-calibrated/ireland.svg`, run `python3 scripts/build_map.py ireland.svg`, then run the tests.
 
 The validator warns if any polluter's site falls outside every county, which catches mistyped coordinates.
+
+## The Sitka spruce overlay
+
+The map has a "Show Sitka spruce plantations" button. It shades squares of about 5 km by the hectares of Coillte forest where Sitka spruce is the main species (`SPP1 = 'SS'` in Coillte's public Forest Inventory, published on data.gov.ie under CC BY 4.0, with credit to Coillte required). It is context only and does not affect any score. Private forests are not included yet; the Department of Agriculture's private forest estate dataset could be added the same way.
+
+`scripts/build_sitka.py` asks Coillte's ArcGIS service for the centre point and area of each Sitka plot (no shapes), adds them up per square, and writes `site/data/sitka-grid.json`. Visitors only ever load that file from the site itself. The script uses the same fetcher as the weekly job, so it can only contact allowlisted hosts (`services7.arcgis.com` is in `config/link_allowlist.json`), and the validator checks every cell.
+
+To refresh it (Coillte updates the inventory about once a year):
+
+```bash
+python3 scripts/build_sitka.py
+python3 scripts/validate.py
+```
 
 ## How the weekly update works
 
