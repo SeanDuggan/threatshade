@@ -1,0 +1,22 @@
+{
+  "_comment": "Hosts that source links may point to. Keep in sync with ALLOWED_LINK_HOSTS in site/app.js (a test checks this).",
+  "link_hosts": [
+    "epa.ie",
+    "irishtimes.com",
+    "irishexaminer.com",
+    "smartwatermagazine.com",
+    "sustainabilityonline.net",
+    "farmersjournal.ie",
+    "donegallive.ie",
+    "fisheriesireland.ie",
+    "catchments.ie",
+    "agriland.ie",
+    "europa.eu",
+    "bnm.ie",
+    "leinsterexpress.ie"
+  ],
+  "fetch_hosts": [
+    "www.epa.ie",
+    "data.epa.ie"
+  ]
+}

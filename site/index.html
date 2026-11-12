@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Threatshade Polluter Scoreboard</title>
+<meta name="description" content="A scoreboard and map of Ireland's worst polluters, built from public EPA, EU and court records.">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <nav aria-label="Sections">
+      <a class="active" href="#scoreboard">// Scoreboard</a>
+      <a href="#method">// How We Score</a>
+      <a href="#sources">// Sources</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div class="hero-grid">
+      <img class="logo" src="assets/logo.jpg" alt="Threatshade logo" width="96" height="96">
+      <div>
+        <h1>//Who's Casting a Shadow <span class="o">Over Irish Nature?</span></h1>
+        <p class="lede">A league table of Ireland's worst polluters. Each one is scored from public records: EU carbon reporting, EPA enforcement lists and court convictions, wastewater failures, and how close the damage sits to protected rivers, estuaries and bays. Pick a polluter to open its file, or change the weightings and watch the table reorder.</p>
+        <p class="updated">Data last reviewed: <span id="reviewed">loading…</span></p>
+      </div>
+    </div>
+    <div class="facts">
+      <div class="fact"><b>10.67 Mt</b><span>CO₂ from Irish power and industry in the EU ETS, 2025</span> <a href="#src-1">[1]</a></div>
+      <div class="fact"><b>55%</b><span>of licensed wastewater plants failed to consistently meet EPA standards, 2025</span> <a href="#src-6">[6]</a></div>
+      <div class="fact"><b>11</b><span>towns and villages still discharging raw sewage every day, mid-2026</span> <a href="#src-6">[6]</a></div>
+      <div class="fact"><b>4</b><span>sites on the EPA's National Priority Sites list, Q2 2026</span> <a href="#src-3">[3]</a></div>
+    </div>
+  </section>
+
+  <noscript><div class="wrap noscript">The scoreboard and map need JavaScript. The method and sources below still apply.</div></noscript>
+
+  <section class="app wrap" id="scoreboard" aria-label="Map and scoreboard">
+    <div class="leftcol">
+      <div class="panel">
+        <h2><span>//Damage Map</span><small>marker size = score</small></h2>
+        <div class="mapbox">
+          <svg id="map" role="img" aria-label="Map of Ireland showing scored polluter sites"></svg>
+          <div class="tooltip" id="tip" role="status"></div>
+        </div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="dossier" aria-live="polite">
+        <div class="panel">
+          <h2><span>//Polluter File</span><small>evidence and sources</small></h2>
+          <div class="inner" id="dossier"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel boardpanel">
+      <h2><span>//Scoreboard</span><small id="count"></small></h2>
+      <div class="controls">
+        <div class="chips" id="chips" role="group" aria-label="Filter by sector"></div>
+        <details class="tune">
+          <summary>Tune the scoring: what matters most to you?</summary>
+          <div class="sliders" id="sliders"></div>
+          <button class="reset" id="reset" type="button">Reset to equal weights</button>
+        </details>
+      </div>
+      <ol class="board" id="board" role="listbox" aria-label="Polluters ranked by damage score"></ol>
+    </div>
+  </section>
+
+  <section class="band" id="method"><div class="wrap">
+    <h2 class="sec">//HOW WE SCORE</h2>
+    <p>Every polluter gets points in five categories, which add up to 100 at equal weights. Points come only from documented records listed in the sources. Moving a slider scales that category up or down, and the total is rescaled to 100 so scores stay comparable.</p>
+    <div class="tablewrap">
+    <table class="mtable">
+      <thead><tr><th>Category</th><th>Max</th><th>How points are given</th></tr></thead>
+      <tbody>
+        <tr><td>Climate</td><td>30</td><td>Reported tonnes of CO₂ on a log scale. 10,000 t scores 0 and Ireland's largest EU ETS emitter (12.3 Mt) scores 30, so a 1 Mt emitter gets about 19. Land-use polluters report no figure, so they get a labelled estimate (drained peat area × a published emission rate) or zero where no estimate is sound.</td></tr>
+        <tr><td>Water</td><td>25</td><td>25 for systemic failures (daily raw sewage plus repeated convictions). 18 for being a current EPA priority site over water or groundwater. 12 to 15 for a court case over discharges to water. 10 for an earlier priority listing linked to water risk.</td></tr>
+        <tr><td>Air and odour</td><td>10</td><td>10 for being a current EPA priority site over air or odour. 7 to 8 for a conviction or earlier listing over air or odour.</td></tr>
+        <tr><td>Enforcement</td><td>20</td><td>10 for being on the current EPA priority list (5 for an earlier listing), 3 for each concluded prosecution up to 15, 2 for each regulator's stop order (up to 4), and 6 more for a fine or penalty of €100,000 or more. Capped at 20.</td></tr>
+        <tr><td>Habitat</td><td>15</td><td>How sensitive the receiving environment is. 15 for sites on or discharging into protected rivers and estuaries (such as the Lower River Shannon or the Blackwater), down to 4 where the damage is spread out, as with aviation. Large owners of drained peatland score 12 to 15. This is the one judgement-based category.</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="tiers">Threat levels: <b class="c-crit">Critical</b> 50+, <b class="c-high">High</b> 35 to 49, <b class="c-elev">Elevated</b> 22 to 34, <b class="c-watch">Watch</b> under 22. Carbon figures are 2025 EU ETS data where published, otherwise the latest available year (marked).</p>
+    <div class="disclaimer"><b>Read this first.</b> The Damage Score is an indicative index put together from public records. It is not a legal finding or an official EPA rating. A low score does not mean a polluter is harmless; it can just mean less is published about it. Map positions marked "approx." show the town or county, not the exact site. Several operators listed have since invested in fixes, and Moneypoint stopped burning coal in June 2025. Spotted pollution? Report it to the EPA at <a href="https://www.epa.ie/" rel="noopener noreferrer">epa.ie</a> or LoCall 0818 335599.</div>
+  </div></section>
+
+  <section class="wrap sources" id="sources">
+    <h2 class="sec">//SOURCES</h2>
+    <ol class="srcs" id="srcs"></ol>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">// Threatshade 2026 © <b>|</b> All Rights Reserved <b>|</b> Public data, ranked in public</div>
+</footer>
+</body>
+</html>

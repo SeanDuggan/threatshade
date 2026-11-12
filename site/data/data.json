@@ -1,0 +1,1283 @@
+{
+  "schema_version": 1,
+  "last_reviewed": "2026-11-12",
+  "sources": [
+    {
+      "id": 1,
+      "title": "EPA: Greenhouse gas emissions from power generation and industry down 5.5% in 2025",
+      "url": "https://www.epa.ie/news-releases/news-releases-2026/irelands-greenhouse-gas-emissions-from-power-generation-and-industry-down-by-55-per-cent-in-2025.php"
+    },
+    {
+      "id": 2,
+      "title": "Irish Times: Ryanair emissions rise again as other large Irish carbon polluters show reductions (May 2026)",
+      "url": "https://www.irishtimes.com/environment/2026/05/05/ryanair-emissions-rise-again-as-other-large-irish-carbon-polluters-show-reductions/"
+    },
+    {
+      "id": 3,
+      "title": "EPA: National Priority Sites list, Q2 2026",
+      "url": "https://www.epa.ie/our-services/compliance--enforcement/whats-happening/national-priority-sites-list"
+    },
+    {
+      "id": 4,
+      "title": "EPA: Priority urban areas where wastewater treatment needs to improve",
+      "url": "https://www.epa.ie/our-services/compliance--enforcement/waste-water/urban-waste-water/urban-waste-water-priority-areas/"
+    },
+    {
+      "id": 5,
+      "title": "Irish Examiner: More than half of wastewater treatment plants fail to meet standards",
+      "url": "https://www.irishexaminer.com/news/arid-41933217.html"
+    },
+    {
+      "id": 6,
+      "title": "Smart Water Magazine: EPA finds 55% of wastewater plants breached licence standards in 2025",
+      "url": "https://smartwatermagazine.com/news/newsroom/irelands-epa-finds-55-of-wastewater-plants-breached-licence-standards-in-2025"
+    },
+    {
+      "id": 7,
+      "title": "EPA: EPA prosecutes Kingspan Limited (P0065-01), April 2026",
+      "url": "https://www.epa.ie/our-services/compliance--enforcement/whats-happening/prosecutions-and-penalties/prosecutions-2026/epa-prosecutes-kingspan-limited-p0065-01.php"
+    },
+    {
+      "id": 8,
+      "title": "EPA: DPP prosecutes Aurivo Dairy Ingredients Limited (P0802-03), March 2025",
+      "url": "https://www.epa.ie/our-services/compliance--enforcement/whats-happening/prosecutions-and-penalties/prosecutions-2025/dpp-prosecutes-aurivo-dairy-ingredients-limited-p0802-03.php"
+    },
+    {
+      "id": 9,
+      "title": "EPA: DPP prosecutes Killarney Waste Disposal Unlimited Company (W0217-01)",
+      "url": "https://www.epa.ie/our-services/compliance--enforcement/whats-happening/prosecutions-and-penalties/prosecutions-2024/dpp-prosecutes-killarney-waste-disposal-unlimited-company-w0217-01.php"
+    },
+    {
+      "id": 10,
+      "title": "Sustainability Online: Unauthorised discharges and odour emissions highlighted in EPA's priority list",
+      "url": "https://sustainabilityonline.net/news/unauthorised-discharges-and-odour-emissions-highlighted-in-epas-priority-list/"
+    },
+    {
+      "id": 11,
+      "title": "Farmers Journal: Co-ops and pig farms on EPA National Priority Site list for 2024",
+      "url": "https://www.farmersjournal.ie/co-ops-and-pig-farms-on-epa-national-priority-site-list-for-2024-865788"
+    },
+    {
+      "id": 12,
+      "title": "Farmers Journal: Airlines, power stations and cement factories among Ireland's top polluters (2023 ETS data)",
+      "url": "https://www3.farmersjournal.ie/airlines-power-stations-and-cement-factories-among-ireland-s-top-polluters-812665"
+    },
+    {
+      "id": 13,
+      "title": "EPA: EPA prosecutes Glenmore Generation Limited (P1004-02), March 2026",
+      "url": "https://www.epa.ie/our-services/compliance--enforcement/whats-happening/prosecutions-and-penalties/prosecutions-2026/epa-prosecutes-glenmore-generation-limited-p1004-02.php"
+    },
+    {
+      "id": 14,
+      "title": "Donegal Live: Company fined after EPA finds environmental breaches at Ballybofey site",
+      "url": "https://www.donegallive.ie/news/crime---court/2034406/company-fined-after-epa-finds-environmental-breaches-at-ballybofey-site.html"
+    },
+    {
+      "id": 15,
+      "title": "EPA: EPA prosecutes Galway City Council (Carrowbrowne Landfill Site), April 2025",
+      "url": "https://epa.ie/our-services/compliance--enforcement/whats-happening/prosecutions-and-penalties/prosecutions-2025/epa-prosecutes-galway-city-council-carrowbrowne-landfill-site-w0013-01.php"
+    },
+    {
+      "id": 16,
+      "title": "EPA: EPA prosecutes North Cork Co-Operative Creameries Limited (P1051-01), 2025",
+      "url": "https://www.epa.ie/our-services/compliance--enforcement/whats-happening/prosecutions-and-penalties/prosecutions-2025/epa-prosecutes-north-cork-co-operative-creameries-limited-p1051-01.php"
+    },
+    {
+      "id": 17,
+      "title": "EPA: EPA prosecutes Uisce Éireann (Swords), June 2026",
+      "url": "https://www.epa.ie/our-services/compliance--enforcement/whats-happening/prosecutions-and-penalties/prosecutions-2026/epa-prosecutes-uisce-eireann-swords-d0024-01.php"
+    },
+    {
+      "id": 18,
+      "title": "EPA: Seven sites identified as National Priorities for enforcement, Q3 2024",
+      "url": "https://epa.ie/news-releases/news-releases-2024/seven-sites-identified-as-national-priorities-for-enforcement-by-the-epa-in-q3-2024.php"
+    },
+    {
+      "id": 19,
+      "title": "EPA: EPA prosecutes Uisce Éireann (Midleton), 2026",
+      "url": "https://www.epa.ie/our-services/compliance--enforcement/whats-happening/prosecutions-and-penalties/prosecutions-2026/epa-prosecutes-uisce-eireann-midleton-d0056-01.php"
+    },
+    {
+      "id": 20,
+      "title": "Irish Times: Airlines and dairy companies in Ireland increased greenhouse gas emissions last year (April 2026)",
+      "url": "https://www.irishtimes.com/environment/climate-crisis/2026/04/10/airlines-and-dairy-companies-in-ireland-increased-greenhouse-gas-emissions-last-year/"
+    },
+    {
+      "id": 21,
+      "title": "Irish Examiner: Irish Water fined for 'overloaded' treatment plants that have 'toxic' effects on rivers",
+      "url": "https://www.irishexaminer.com/news/courtandcrime/arid-41068061.html"
+    },
+    {
+      "id": 22,
+      "title": "Farmers Journal: North Cork Creameries and Dawn Farm Foods site on EPA watchlist",
+      "url": "https://www.farmersjournal.ie/news/news/north-cork-creameries-and-dawn-farm-foods-site-on-epa-watchlist-915805"
+    },
+    {
+      "id": 23,
+      "title": "Irish Times: Does Ireland have the will to undo the disaster of plantation forestry? (Oct 2026)",
+      "url": "https://irishtimes.com/environment/2026/10/01/does-ireland-have-the-will-to-undo-the-disaster-of-plantation-forestry"
+    },
+    {
+      "id": 24,
+      "title": "Inland Fisheries Ireland: Coillte and contractors found guilty of polluting Glenaboy River in Cork",
+      "url": "https://fisheriesireland.ie/news/press-releases/coillte-and-contractors-found-guilty-of-polluting-glenaboy-river-in-cork"
+    },
+    {
+      "id": 25,
+      "title": "Irish Times: Coillte ordered to stop felling at forest over fears for oak trees (Aug 2026)",
+      "url": "https://www.irishtimes.com/environment/2026/08/19/coillte-ordered-to-stop-felling-at-forest-over-fears-for-oak-trees/"
+    },
+    {
+      "id": 26,
+      "title": "Catchments.ie (EPA): Impacts of forestry on water quality",
+      "url": "https://catchments.ie/wp-content/uploads/2024/05/Impacts-of-Forestry-on-water-quality.pdf"
+    },
+    {
+      "id": 27,
+      "title": "Agriland: Dr Kenneth Byrne on afforested peatland emissions, Oireachtas committee",
+      "url": "https://www.agriland.ie/?p=907726"
+    },
+    {
+      "id": 28,
+      "title": "Irish Examiner: Ireland's peatland paradox: restoring bogs while commercial extraction continues",
+      "url": "https://www.irishexaminer.com/lifestyle/outdoors/arid-41912713.html"
+    },
+    {
+      "id": 29,
+      "title": "European Commission: Enhanced rehabilitation of peatlands (Bord na Móna, €108m)",
+      "url": "https://commission.europa.eu/projects/enhanced-rehabilitation-peatlands_hr"
+    },
+    {
+      "id": 30,
+      "title": "Bord na Móna: Brown to Green transformation, end of peat at Edenderry",
+      "url": "https://www.bnm.ie/?p=222572"
+    },
+    {
+      "id": 31,
+      "title": "Irish Times (Bord na Móna sponsored content): Discovering the true ecological value of Ireland's peatlands",
+      "url": "https://www.irishtimes.com/sponsored/bord-na-mona/discovering-the-true-ecological-value-of-ireland-s-peatlands-1.4638008"
+    },
+    {
+      "id": 32,
+      "title": "Leinster Express: No expansion of Laois forests or reduction of Sitka spruce planned by Coillte (Apr 2026)",
+      "url": "https://www.leinsterexpress.ie/news/business/328711/no-expansion-of-laois-forests-or-reduction-of-sitka-spruce-trees-planned-by-coillte.html"
+    },
+    {
+      "id": 33,
+      "title": "EPA: Ireland's State of the Environment Report 2024, climate chapter (LULUCF)",
+      "url": "https://epawebapp.epa.ie/ebooks/soe2024/102/"
+    }
+  ],
+  "polluters": [
+    {
+      "id": "coillte",
+      "name": "Coillte",
+      "sector": "Land use",
+      "co2_tonnes": 390600,
+      "co2_year": null,
+      "co2_estimated": true,
+      "points": {
+        "water": 15,
+        "air": 0,
+        "habitat": 15
+      },
+      "enforcement": {
+        "nps": null,
+        "prosecutions": 1,
+        "stop_orders": 1,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [
+        {
+          "label": "Largest peat owner",
+          "alert": true
+        },
+        {
+          "label": "Estimated emissions",
+          "alert": false
+        }
+      ],
+      "sites": [
+        {
+          "name": "Derryclare, Connemara",
+          "lat": 53.47,
+          "lng": -9.76
+        },
+        {
+          "name": "Glenaboy River, near Tallow, Co Cork",
+          "lat": 52.1,
+          "lng": -8.02
+        },
+        {
+          "name": "Drumwood, Rossmore, Co Tipperary (approx.)",
+          "lat": 52.6,
+          "lng": -7.98
+        },
+        {
+          "name": "Slieve Bloom, Co Laois",
+          "lat": 53.07,
+          "lng": -7.6
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2026",
+          "text": "Holds about 445,000 hectares, including 232,500 hectares of peatland. That makes it the largest single owner of peatland in Ireland.",
+          "source": 23
+        },
+        {
+          "date": "2026",
+          "text": "Across all owners, 52.5% of Irish forests are Sitka spruce.",
+          "source": 32
+        },
+        {
+          "date": "To 2021",
+          "text": "Forestry is a significant pressure on 14% of at-risk rivers (192 of 1,337), mostly through fine sediment, which harms the critically endangered freshwater pearl mussel. This figure covers all forestry, not only Coillte's.",
+          "source": 26
+        },
+        {
+          "date": "Nov 2022",
+          "text": "Pleaded guilty after silt from thinning work damaged salmon and sea trout spawning beds on the Glenaboy River in Co Cork. Given the Probation Act and ordered to pay €2,000 to Tallow Tidy Towns.",
+          "source": 24
+        },
+        {
+          "date": "Aug 2026",
+          "text": "The Forest Service told Coillte to stop all felling at Drumwood in Co Tipperary after locals reported native oaks being cut under a licence that covered only spruce.",
+          "source": 25
+        },
+        {
+          "date": "Estimate",
+          "text": "Forested blanket peat emits about 1.68 t CO₂ per hectare each year. Applied to all 232,500 ha of Coillte peatland, that gives roughly 0.39 Mt a year. This is an upper-end estimate, not a reported figure.",
+          "source": 27
+        }
+      ],
+      "note": "Coillte says it is committed to redesigning 30,000 ha of peatland forest, and it runs a Forests for Nature programme. At its Derryclare pathfinder project, no conifers had been removed seven years after work began.",
+      "epa_licences": []
+    },
+    {
+      "id": "bnm",
+      "name": "Bord na Móna",
+      "sector": "Land use",
+      "co2_tonnes": null,
+      "co2_year": null,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 0,
+        "habitat": 12
+      },
+      "enforcement": {
+        "nps": null,
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": true,
+        "raw_sewage": false
+      },
+      "extra_badges": [
+        {
+          "label": "Restoring bogs",
+          "alert": false
+        }
+      ],
+      "sites": [
+        {
+          "name": "Edenderry, Co Offaly",
+          "lat": 53.291,
+          "lng": -7.087
+        },
+        {
+          "name": "Lough Boora, Co Offaly (approx.)",
+          "lat": 53.22,
+          "lng": -7.72
+        },
+        {
+          "name": "Kellysgrove, east Galway (approx.)",
+          "lat": 53.3,
+          "lng": -8.08
+        }
+      ],
+      "evidence": [
+        {
+          "date": "Today",
+          "text": "Owns about 80,000 hectares, mostly former industrial peat bogs drained for extraction.",
+          "source": 31
+        },
+        {
+          "date": "Dec 2023",
+          "text": "Burned peat for the last time at Edenderry, which now runs on biomass, ending its peat business.",
+          "source": 30
+        },
+        {
+          "date": "Late 2025",
+          "text": "About 20,000 ha rehabilitated under the Peatlands Climate Action Scheme, with 7,273 ha restored to peat-forming conditions.",
+          "source": 28
+        },
+        {
+          "date": "2021–26",
+          "text": "€108m in EU recovery funding to rehabilitate 33,000 ha across 82 bogs, due to finish by 31 August 2026.",
+          "source": 29
+        },
+        {
+          "date": "2023",
+          "text": "Ireland's land-use sector was a net source of 5.61 Mt CO₂e, largely because of drained organic soils and peat extraction. No company-level figure is published.",
+          "source": 33
+        }
+      ],
+      "note": "Bord na Móna scores low because it has stopped extracting peat and is rewetting its bogs. Its climate score is zero only because no current emissions figure for its remaining drained land is published, not because that land is harmless.",
+      "epa_licences": []
+    },
+    {
+      "id": "uisce",
+      "name": "Uisce Éireann",
+      "sector": "Water utility",
+      "co2_tonnes": null,
+      "co2_year": null,
+      "co2_estimated": false,
+      "points": {
+        "water": 25,
+        "air": 0,
+        "habitat": 15
+      },
+      "enforcement": {
+        "nps": null,
+        "prosecutions": 35,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": true
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Foynes",
+          "lat": 52.611,
+          "lng": -9.11
+        },
+        {
+          "name": "Glin",
+          "lat": 52.571,
+          "lng": -9.283
+        },
+        {
+          "name": "Kilkee",
+          "lat": 52.682,
+          "lng": -9.645
+        },
+        {
+          "name": "Howth (Doldrum Bay)",
+          "lat": 53.375,
+          "lng": -6.07
+        },
+        {
+          "name": "Swords",
+          "lat": 53.46,
+          "lng": -6.22
+        },
+        {
+          "name": "Midleton",
+          "lat": 51.915,
+          "lng": -8.175
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2025",
+          "text": "Wastewater from 55% of its licensed treatment plants did not consistently meet EPA standards.",
+          "source": 6
+        },
+        {
+          "date": "Mid-2026",
+          "text": "11 towns and villages still discharge raw sewage every day, including Foynes, Glin, Kilkee and Howth (Doldrum Bay).",
+          "source": 5
+        },
+        {
+          "date": "2025",
+          "text": "13 of Ireland's 190 large urban areas failed EU treatment standards. Together they produce 48% of the wastewater from those areas.",
+          "source": 4
+        },
+        {
+          "date": "To 2026",
+          "text": "The EPA has secured 35 successful prosecutions for breaches of discharge authorisations, seven of them in the past year.",
+          "source": 6
+        },
+        {
+          "date": "Jun 2026",
+          "text": "Prosecuted by the EPA at Dublin Metropolitan District Court over its Swords wastewater licence.",
+          "source": 17
+        },
+        {
+          "date": "2026",
+          "text": "Convicted over breaches of its Midleton wastewater licence and fined €1,000 per charge.",
+          "source": 19
+        },
+        {
+          "date": "Earlier case",
+          "text": "Overloaded plants caused ammonia at ten times the limit, affecting freshwater pearl mussels downstream.",
+          "source": 21
+        }
+      ],
+      "note": "Uisce Éireann says it has eliminated most raw sewage discharges since 2014, and the EPA has acknowledged progress at priority areas.",
+      "epa_licences": [
+        "D0024-01",
+        "D0056-01"
+      ]
+    },
+    {
+      "id": "northcork",
+      "name": "North Cork Co-Op Creameries",
+      "sector": "Dairy & food",
+      "co2_tonnes": null,
+      "co2_year": null,
+      "co2_estimated": false,
+      "points": {
+        "water": 18,
+        "air": 0,
+        "habitat": 15
+      },
+      "enforcement": {
+        "nps": "current",
+        "prosecutions": 1,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Kanturk, Co Cork",
+          "lat": 52.172,
+          "lng": -8.905
+        }
+      ],
+      "evidence": [
+        {
+          "date": "Q2 2026",
+          "text": "On the EPA's National Priority Sites list for emissions to water and how it runs its wastewater treatment plant.",
+          "source": 3
+        },
+        {
+          "date": "2025",
+          "text": "Convicted of licence breaches, including contaminated stormwater leaving an emission point.",
+          "source": 16
+        },
+        {
+          "date": "Q3 2024",
+          "text": "Listed as a priority site, one of three milk processors on the list that quarter.",
+          "source": 18
+        }
+      ],
+      "note": null,
+      "epa_licences": [
+        "P1051-01"
+      ]
+    },
+    {
+      "id": "aurivo",
+      "name": "Aurivo Dairy Ingredients",
+      "sector": "Dairy & food",
+      "co2_tonnes": 26962,
+      "co2_year": 2023,
+      "co2_estimated": false,
+      "points": {
+        "water": 15,
+        "air": 0,
+        "habitat": 10
+      },
+      "enforcement": {
+        "nps": "past",
+        "prosecutions": 1,
+        "stop_orders": 0,
+        "big_fine": true
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Ballaghaderreen, Co Roscommon",
+          "lat": 53.901,
+          "lng": -8.58
+        }
+      ],
+      "evidence": [
+        {
+          "date": "Mar 2025",
+          "text": "Prosecuted by the DPP at Sligo Circuit Criminal Court after an EPA investigation. Fines and penalties came to €350,000.",
+          "source": 10
+        },
+        {
+          "date": "Mar 2025",
+          "text": "Ordered to pay €150,000 over ten years to community groups and Inland Fisheries Ireland for the River Lung.",
+          "source": 8
+        },
+        {
+          "date": "2023",
+          "text": "Reported 26,962 t CO₂ under the EU ETS.",
+          "source": 12
+        }
+      ],
+      "note": null,
+      "epa_licences": [
+        "P0802-03"
+      ]
+    },
+    {
+      "id": "chemifloc",
+      "name": "Chemifloc",
+      "sector": "Chemicals",
+      "co2_tonnes": null,
+      "co2_year": null,
+      "co2_estimated": false,
+      "points": {
+        "water": 18,
+        "air": 0,
+        "habitat": 8
+      },
+      "enforcement": {
+        "nps": "current",
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Shannon, Co Clare (approx.)",
+          "lat": 52.705,
+          "lng": -8.865
+        }
+      ],
+      "evidence": [
+        {
+          "date": "Q2 2026",
+          "text": "On the EPA's National Priority Sites list for groundwater contamination.",
+          "source": 3
+        }
+      ],
+      "note": null,
+      "epa_licences": []
+    },
+    {
+      "id": "aughinish",
+      "name": "Aughinish Alumina",
+      "sector": "Heavy industry",
+      "co2_tonnes": 1100000,
+      "co2_year": 2025,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 0,
+        "habitat": 15
+      },
+      "enforcement": {
+        "nps": null,
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Aughinish Island, Co Limerick",
+          "lat": 52.63,
+          "lng": -9.05
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2025",
+          "text": "Reported 1.1 Mt CO₂ under the EU ETS, down just over 1.5%. Ireland's largest single industrial emitter.",
+          "source": 2
+        }
+      ],
+      "note": "The refinery sits on the Shannon Estuary, which is designated for protection, hence the maximum habitat score.",
+      "epa_licences": []
+    },
+    {
+      "id": "esb",
+      "name": "ESB power stations",
+      "sector": "Power",
+      "co2_tonnes": 2090000,
+      "co2_year": 2025,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 0,
+        "habitat": 12
+      },
+      "enforcement": {
+        "nps": null,
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Moneypoint, Co Clare",
+          "lat": 52.606,
+          "lng": -9.419
+        },
+        {
+          "name": "Poolbeg & Ringsend, Dublin",
+          "lat": 53.34,
+          "lng": -6.19
+        },
+        {
+          "name": "Aghada, Co Cork",
+          "lat": 51.835,
+          "lng": -8.215
+        },
+        {
+          "name": "Shannonbridge, Co Offaly",
+          "lat": 53.28,
+          "lng": -8.05
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2025",
+          "text": "Just over 2.09 Mt CO₂ across seven stations, including North Wall, Ringsend, Poolbeg, Corduff, Aghada, Shannonbridge and Moneypoint.",
+          "source": 2
+        },
+        {
+          "date": "Jun 2025",
+          "text": "Moneypoint stopped burning coal, cutting the station's emissions by 49%.",
+          "source": 1
+        }
+      ],
+      "note": null,
+      "epa_licences": []
+    },
+    {
+      "id": "ryanair",
+      "name": "Ryanair",
+      "sector": "Aviation",
+      "co2_tonnes": 12300000,
+      "co2_year": 2025,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 0,
+        "habitat": 4
+      },
+      "enforcement": {
+        "nps": null,
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": true,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Dublin Airport (HQ)",
+          "lat": 53.4213,
+          "lng": -6.2701
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2025",
+          "text": "Reported 12.3 Mt CO₂ under the EU ETS, up 2%. Ireland's largest ETS emitter by far.",
+          "source": 2
+        },
+        {
+          "date": "2025",
+          "text": "Intra-European flights by Irish airlines emitted more than 13.4 Mt, more than all other transport in Ireland combined.",
+          "source": 20
+        }
+      ],
+      "note": "Aviation damage is spread out rather than tied to one habitat, so it scores low on habitat and high on climate.",
+      "epa_licences": []
+    },
+    {
+      "id": "irishcement",
+      "name": "Irish Cement (CRH)",
+      "sector": "Heavy industry",
+      "co2_tonnes": 1250000,
+      "co2_year": 2025,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 0,
+        "habitat": 10
+      },
+      "enforcement": {
+        "nps": null,
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Platin, Co Meath",
+          "lat": 53.69,
+          "lng": -6.33
+        },
+        {
+          "name": "Limerick Works",
+          "lat": 52.636,
+          "lng": -8.676
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2025",
+          "text": "Just over 1.25 Mt CO₂ combined from Platin and Limerick, down 3.7%. Emissions rose at Platin and fell at Limerick.",
+          "source": 2
+        },
+        {
+          "date": "2023",
+          "text": "Limerick Works alone reported 716,710 t CO₂.",
+          "source": 12
+        }
+      ],
+      "note": null,
+      "epa_licences": []
+    },
+    {
+      "id": "arrow",
+      "name": "Arrow Group",
+      "sector": "Dairy & food",
+      "co2_tonnes": null,
+      "co2_year": null,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 10,
+        "habitat": 4
+      },
+      "enforcement": {
+        "nps": "current",
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Co Kildare (approx.)",
+          "lat": 53.215,
+          "lng": -6.665
+        }
+      ],
+      "evidence": [
+        {
+          "date": "Q2 2026",
+          "text": "On the EPA's National Priority Sites list for odour management.",
+          "source": 3
+        },
+        {
+          "date": "Earlier",
+          "text": "Has appeared on the priority list before.",
+          "source": 22
+        }
+      ],
+      "note": null,
+      "epa_licences": []
+    },
+    {
+      "id": "alert",
+      "name": "Alert Packaging",
+      "sector": "Manufacturing",
+      "co2_tonnes": null,
+      "co2_year": null,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 10,
+        "habitat": 4
+      },
+      "enforcement": {
+        "nps": "current",
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Co Wicklow (approx.)",
+          "lat": 52.98,
+          "lng": -6.05
+        }
+      ],
+      "evidence": [
+        {
+          "date": "Q2 2026",
+          "text": "On the EPA's National Priority Sites list for emissions to air and odour management.",
+          "source": 3
+        }
+      ],
+      "note": null,
+      "epa_licences": []
+    },
+    {
+      "id": "tipperary",
+      "name": "Tipperary Co-op Creamery",
+      "sector": "Dairy & food",
+      "co2_tonnes": 19778,
+      "co2_year": 2023,
+      "co2_estimated": false,
+      "points": {
+        "water": 10,
+        "air": 0,
+        "habitat": 6
+      },
+      "enforcement": {
+        "nps": "past",
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Tipperary town",
+          "lat": 52.473,
+          "lng": -8.16
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2024",
+          "text": "A National Priority Site in 2024, and still on the list going into 2025.",
+          "source": 11
+        },
+        {
+          "date": "Q3 2024",
+          "text": "One of three milk processors on the list. The EPA called on the dairy sector to invest in controls to stop polluting discharges.",
+          "source": 18
+        },
+        {
+          "date": "2023",
+          "text": "Reported 19,778 t CO₂ under the EU ETS.",
+          "source": 12
+        }
+      ],
+      "note": null,
+      "epa_licences": []
+    },
+    {
+      "id": "galway",
+      "name": "Galway City Council (Carrowbrowne landfill)",
+      "sector": "Waste",
+      "co2_tonnes": null,
+      "co2_year": null,
+      "co2_estimated": false,
+      "points": {
+        "water": 12,
+        "air": 0,
+        "habitat": 8
+      },
+      "enforcement": {
+        "nps": null,
+        "prosecutions": 1,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Carrowbrowne, Galway",
+          "lat": 53.31,
+          "lng": -9.03
+        }
+      ],
+      "evidence": [
+        {
+          "date": "Apr 2025",
+          "text": "Prosecuted at Galway District Court, including for not telling Inland Fisheries Ireland promptly about contaminated discharges to surface water.",
+          "source": 15
+        }
+      ],
+      "note": null,
+      "epa_licences": [
+        "W0013-01"
+      ]
+    },
+    {
+      "id": "kingspan",
+      "name": "Kingspan (Kingscourt)",
+      "sector": "Manufacturing",
+      "co2_tonnes": null,
+      "co2_year": null,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 8,
+        "habitat": 6
+      },
+      "enforcement": {
+        "nps": "past",
+        "prosecutions": 1,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Kingscourt, Co Cavan",
+          "lat": 53.905,
+          "lng": -6.797
+        }
+      ],
+      "evidence": [
+        {
+          "date": "Q1 2025",
+          "text": "On the EPA priority list for air emissions and facility management.",
+          "source": 10
+        },
+        {
+          "date": "Apr 2026",
+          "text": "Convicted on three charges and fined €9,000 in total. The charges covered making organic chemicals without a licence and eight emission points left out of its licence.",
+          "source": 7
+        }
+      ],
+      "note": null,
+      "epa_licences": [
+        "P0065-01"
+      ]
+    },
+    {
+      "id": "killarney",
+      "name": "Killarney Waste Disposal",
+      "sector": "Waste",
+      "co2_tonnes": null,
+      "co2_year": null,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 0,
+        "habitat": 8
+      },
+      "enforcement": {
+        "nps": "past",
+        "prosecutions": 1,
+        "stop_orders": 0,
+        "big_fine": true
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Aughacurreen, Killarney (approx.)",
+          "lat": 52.07,
+          "lng": -9.47
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2024",
+          "text": "Convicted, with fines and penalties of €500,000.",
+          "source": 10
+        },
+        {
+          "date": "2013–14",
+          "text": "Accepted waste beyond its licensed limit of 40,000 tonnes a year.",
+          "source": 9
+        }
+      ],
+      "note": null,
+      "epa_licences": [
+        "W0217-01"
+      ]
+    },
+    {
+      "id": "glenmore",
+      "name": "Glenmore Generation",
+      "sector": "Waste",
+      "co2_tonnes": null,
+      "co2_year": null,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 7,
+        "habitat": 12
+      },
+      "enforcement": {
+        "nps": null,
+        "prosecutions": 1,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Ballybofey, Co Donegal",
+          "lat": 54.8,
+          "lng": -7.8
+        }
+      ],
+      "evidence": [
+        {
+          "date": "Mar 2026",
+          "text": "Convicted at Letterkenny District Court and fined €3,000 over odour from a waste-processing site on the banks of the River Finn. It also had to make a €3,000 donation to a local school.",
+          "source": 13
+        },
+        {
+          "date": "Mar 2026",
+          "text": "Residents told the court the smell was so bad they could not invite family to their homes.",
+          "source": 14
+        }
+      ],
+      "note": null,
+      "epa_licences": [
+        "P1004-02"
+      ]
+    },
+    {
+      "id": "aerlingus",
+      "name": "Aer Lingus",
+      "sector": "Aviation",
+      "co2_tonnes": 770000,
+      "co2_year": 2025,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 0,
+        "habitat": 4
+      },
+      "enforcement": {
+        "nps": null,
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": true,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Dublin Airport (approx.)",
+          "lat": 53.432,
+          "lng": -6.235
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2025",
+          "text": "Reported 0.77 Mt CO₂ for intra-European flights, up 2.4%.",
+          "source": 2
+        }
+      ],
+      "note": null,
+      "epa_licences": []
+    },
+    {
+      "id": "kerry",
+      "name": "Kerry Ingredients",
+      "sector": "Dairy & food",
+      "co2_tonnes": 90598,
+      "co2_year": 2023,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 0,
+        "habitat": 10
+      },
+      "enforcement": {
+        "nps": null,
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Listowel, Co Kerry",
+          "lat": 52.446,
+          "lng": -9.485
+        },
+        {
+          "name": "Charleville (Golden Vale)",
+          "lat": 52.355,
+          "lng": -8.68
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2023",
+          "text": "90,598 t CO₂ across two installations, the highest of the agri-food companies in the ETS.",
+          "source": 12
+        },
+        {
+          "date": "2025",
+          "text": "Emissions from dairy processors rose 3.6% while most other large emitters cut theirs.",
+          "source": 1
+        }
+      ],
+      "note": null,
+      "epa_licences": []
+    },
+    {
+      "id": "tirlan",
+      "name": "Tirlán (Virginia)",
+      "sector": "Dairy & food",
+      "co2_tonnes": 23808,
+      "co2_year": 2023,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 0,
+        "habitat": 8
+      },
+      "enforcement": {
+        "nps": null,
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Virginia, Co Cavan",
+          "lat": 53.835,
+          "lng": -7.08
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2023",
+          "text": "Reported 23,808 t CO₂ under the EU ETS.",
+          "source": 12
+        }
+      ],
+      "note": null,
+      "epa_licences": []
+    },
+    {
+      "id": "timoleague",
+      "name": "Timoleague Agri Gen",
+      "sector": "Waste",
+      "co2_tonnes": null,
+      "co2_year": null,
+      "co2_estimated": false,
+      "points": {
+        "water": 0,
+        "air": 0,
+        "habitat": 6
+      },
+      "enforcement": {
+        "nps": "past",
+        "prosecutions": 0,
+        "stop_orders": 0,
+        "big_fine": false
+      },
+      "flags": {
+        "rising": false,
+        "restoring": false,
+        "raw_sewage": false
+      },
+      "extra_badges": [],
+      "sites": [
+        {
+          "name": "Co Cork (approx.)",
+          "lat": 51.93,
+          "lng": -8.78
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2024–25",
+          "text": "An anaerobic digestion site on the National Priority Sites list through 2024 and into Q1 2025.",
+          "source": 11
+        }
+      ],
+      "note": null,
+      "epa_licences": []
+    }
+  ]
+}

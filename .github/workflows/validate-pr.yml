@@ -1,0 +1,33 @@
+# Runs on every pull request and push to main. Read-only.
+name: validate
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Validate data (and compare with main on pull requests)
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            python3 scripts/validate.py --baseline-ref "origin/$BASE_REF"
+          else
+            python3 scripts/validate.py
+          fi
