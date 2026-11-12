@@ -10,6 +10,8 @@ The site has no server, database, login or forms. It is plain HTML, CSS and Java
 site/                    What gets deployed (Cloudflare Pages output directory)
   index.html             Page markup; no inline scripts or styles
   404.html               Shown for unknown URLs (Cloudflare Pages returns it with a 404 status)
+  favicon.svg, favicon.ico, icon-192.png, icon-512.png, site.webmanifest
+                         Browser and home-screen icons (red "//" mark; iPhones use assets/logo.jpg)
   styles.css             All styling
   app.js                 Scoring, map and scoreboard; renders data with DOM APIs only
   data/data.json         The polluters, scores inputs, evidence and sources
