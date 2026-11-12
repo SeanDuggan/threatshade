@@ -2,7 +2,11 @@
 
 ## Reporting a problem
 
-Please report security issues privately using GitHub's "Report a vulnerability" (private vulnerability reporting) on this repository rather than opening a public issue. Factual corrections about a listed organisation can be raised as a normal issue with a link to the source.
+Email **security@threatshade.com**. Please do not open a public issue for security problems. Factual corrections about a listed organisation can be raised as a normal issue with a link to the source.
+
+Threatshade is a volunteer project with no budget, so there is no bug bounty, but we will credit reporters who want it. The full policy (response times, scope, safe harbour) is in `site/security-policy.txt`, published at https://threatshade.com/security-policy.txt. The machine-readable contact is `site/.well-known/security.txt` (RFC 9116), published at https://threatshade.com/.well-known/security.txt.
+
+`security.txt` has an `Expires` date (currently 2027-11-01). Update it before then, and keep it less than a year ahead.
 
 ## Controls in place
 

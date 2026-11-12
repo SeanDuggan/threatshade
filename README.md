@@ -14,6 +14,8 @@ site/                    What gets deployed (Cloudflare Pages output directory)
   data/data.json         The polluters, scores inputs, evidence and sources
   assets/logo.jpg        Threatshade logo
   _headers               Security headers for Cloudflare Pages (CSP, HSTS, etc.)
+  .well-known/security.txt  Security contact (RFC 9116); renew Expires yearly
+  security-policy.txt    Vulnerability disclosure policy
 scripts/
   common.py              Shared helpers and the Python copy of the scoring formula
   fetch_updates.py       Weekly fetch from EPA sources (standard library only)
@@ -72,7 +74,7 @@ Then in the repository settings:
 ## Deploy to Cloudflare Pages (after the threat model)
 
 - Connect the GitHub repo, production branch `main`.
-- Build command: none. Build output directory: `site`.
+- Build command: none. Build output directory: `site`. Only `site/` is published, so repo docs (`*.md`) never go live; a test fails the build if any Markdown file is placed in `site/`.
 - `site/_headers` sets the security headers. Check them after the first deploy with `curl -sI https://<your-domain>/`.
 - Turn off preview deployments for pull requests from forks, or keep the repo private.
 

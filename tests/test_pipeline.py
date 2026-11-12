@@ -51,6 +51,12 @@ class DataFile(unittest.TestCase):
         self.assertNotIn("style=", html)
         self.assertNotIn("<style", html)
 
+    def test_no_markdown_in_published_site(self):
+        # site/ is the Cloudflare Pages output directory; repo docs must never be published.
+        found = [str(p.relative_to(ROOT)) for p in (ROOT / "site").rglob("*")
+                 if p.is_file() and p.suffix.lower() in (".md", ".markdown", ".mdx")]
+        self.assertEqual(found, [], "Markdown files must not be in site/")
+
 
 class Validator(unittest.TestCase):
     def errs(self, mutate):

@@ -1,0 +1,52 @@
+Threatshade vulnerability disclosure policy
+===========================================
+
+Threatshade is an independent, volunteer-run project that tracks pollution
+in Ireland using public records. It is not a business and has no budget.
+We still want to hear about security problems and will treat reports
+seriously.
+
+How to report
+-------------
+Email security@threatshade.com with:
+  - what you found and where (URL, file or component)
+  - steps to reproduce, or a proof of concept
+  - the impact you think it has
+
+Please do not include personal data belonging to anyone else.
+
+What to expect
+--------------
+We are volunteers, so these are aims rather than guarantees:
+  - We will acknowledge your report within 7 days.
+  - We will keep you updated and tell you when it is fixed.
+  - Please give us 90 days to fix the problem before you publish details.
+    We can agree a different date with you.
+
+Rewards
+-------
+We cannot offer payment or a bug bounty. If you would like, we will thank
+you by name (or handle) when the fix is released.
+
+In scope
+--------
+  - The website at threatshade.com and its subdomains
+  - The Threatshade source code and data pipeline
+
+Out of scope
+------------
+  - Disagreements about a listed organisation's data or score. Please send
+    these as factual corrections, with a link to the source.
+  - Third-party services we use (for example Cloudflare, GitHub, EPA
+    websites). Report those to the provider.
+  - Missing best-practice headers or settings with no demonstrated impact
+  - Denial of service, load testing, spam or social engineering
+  - Results from automated scanners without a working proof of concept
+
+Safe harbour
+------------
+If you act in good faith, follow this policy, avoid harming users, data or
+availability, and only test as much as you need to show the problem, we will
+not take legal action against you or ask anyone else to.
+
+This file is linked from https://threatshade.com/.well-known/security.txt
