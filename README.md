@@ -12,6 +12,7 @@ site/                    What gets deployed (Cloudflare Pages output directory)
   styles.css             All styling
   app.js                 Scoring, map and scoreboard; renders data with DOM APIs only
   data/data.json         The polluters, scores inputs, evidence and sources
+  data/ireland-map.json  County outlines (from the MapSVG Ireland map, CC0), as plain integer rings
   assets/logo.jpg        Threatshade logo
   assets/fonts/          Self-hosted fonts (woff2) and their OFL licences
   _headers               Security headers for Cloudflare Pages (CSP, HSTS, etc.)
@@ -20,7 +21,8 @@ site/                    What gets deployed (Cloudflare Pages output directory)
 scripts/
   common.py              Shared helpers and the Python copy of the scoring formula
   fetch_updates.py       Weekly fetch from EPA sources (standard library only)
-  validate.py            Strict validation of data.json plus change warnings
+  validate.py            Strict validation of data.json and the map, plus change warnings
+  build_map.py           Rebuilds ireland-map.json from the MapSVG source SVG (only when needed)
 config/link_allowlist.json   Hosts that source links and the fetcher may use
 data/state/              What the fetcher saw last time (for change detection)
 tests/                   Unit tests (python3 -m unittest discover -s tests -v)
@@ -46,6 +48,14 @@ python3 scripts/validate.py
 ```
 
 No packages need installing. Everything uses the Python 3.10+ standard library.
+
+## The county map
+
+County boundaries come from MapSVG's geo-calibrated Ireland map (https://mapsvg.com/maps/ireland/, CC0 1.0, no attribution required; credited on the page anyway). The SVG is not served or embedded. `scripts/build_map.py` converts it into `site/data/ireland-map.json`, which holds only county codes, names and integer outlines, and the app draws the shapes itself. The source map uses a Mercator projection within its stated bounds; `app.js` and `scripts/common.py` share that projection, and a test checks that known towns land in the right county.
+
+To refresh the geometry: download `https://mapsvg.com/maps/geo-calibrated/ireland.svg`, run `python3 scripts/build_map.py ireland.svg`, then run the tests.
+
+The validator warns if any polluter's site falls outside every county, which catches mistyped coordinates.
 
 ## How the weekly update works
 

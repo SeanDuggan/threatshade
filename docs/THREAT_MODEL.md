@@ -66,6 +66,7 @@ flowchart LR
 | 7 | Information disclosure | Personal data in the repo or site (emails, private individuals) | Only organisations are listed; no analytics | Policy for sole traders or small farms appearing in EPA lists |
 | 8 | Denial of service | Takedown pressure or traffic floods from listed organisations | Cloudflare edge caching | Legal takedown process; backup hosting |
 | 9 | Spoofing | Look-alike domains or a cloned site spreading false scores | None yet | Monitor for look-alikes; publish a data hash? |
+| 10a | Tampering | Malicious or altered geometry in a refreshed MapSVG file | Converted offline to integer rings; validator and app reject anything else; no SVG markup reaches the page | Pin the source file's hash in the repo when refreshing? |
 | 10 | Tampering (non-technical) | Legal or reputational damage from a wrong claim | Sources on every claim, human review, disclaimer | Corrections process and response time |
 
 ## Assumptions to confirm

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:mapsvg="http://mapsvg.com" mapsvg:geoViewBox="-10.617532 55.384216 -5.429631 51.419751" width="605.68188" height="775.40155">
+  <path id="IE-CW" title="Carlow" d="m 450,490 10,0 0,10 -10,0 z m 30,0 10,0 0,10 -10,0 z"/>
+  <path id="not-a-county" title="Ignored" d="m 1,1 2,2 z"/>
+</svg>

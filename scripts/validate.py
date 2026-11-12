@@ -20,7 +20,8 @@ import subprocess
 import sys
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
-from common import DATA_PATH, REPORT_PATH, ROOT, allowlist, host_allowed, load_json, score  # noqa: E402
+from common import (DATA_PATH, MAP_PATH, REPORT_PATH, RING_RE, ROOT, allowlist, area_at,  # noqa: E402
+                    decode_ring, host_allowed, load_json, score)
 
 SECTORS = {"Water utility", "Dairy & food", "Chemicals", "Heavy industry", "Power", "Aviation",
            "Manufacturing", "Waste", "Land use"}
@@ -156,6 +157,66 @@ def validate(data, r: Result | None = None) -> Result:
     return r
 
 
+AREA_ID_RE = re.compile(r"^(IE-[A-Z]{1,2}|GB-NIR)$")
+MAP_MAX_BYTES = 300_000
+
+
+def validate_map(m, r: Result | None = None) -> Result:
+    """The county map is third-party geometry: allow only ids, names and integer rings."""
+    r = r or Result()
+    if not isinstance(m, dict):
+        r.err("map: top level must be an object")
+        return r
+    allowed = {"source", "width", "height", "geo_bounds", "unit", "encoding", "areas"}
+    if set(m) - allowed:
+        r.err(f"map: unexpected keys {sorted(set(m) - allowed)}")
+    _num(r, "map.width", m.get("width"), 100, 2000)
+    _num(r, "map.height", m.get("height"), 100, 2000)
+    _num(r, "map.unit", m.get("unit"), 0.01, 1)
+    g = m.get("geo_bounds") or {}
+    _num(r, "map.geo_bounds.west", g.get("west"), -11, -10)
+    _num(r, "map.geo_bounds.east", g.get("east"), -6, -5)
+    _num(r, "map.geo_bounds.north", g.get("north"), 55, 56)
+    _num(r, "map.geo_bounds.south", g.get("south"), 51, 52)
+    if r.errors:
+        return r
+    areas = m.get("areas") or []
+    if not (20 <= len(areas) <= 40):
+        r.err("map: expected 20 to 40 areas")
+    ids = set()
+    for i, a in enumerate(areas):
+        w = f"map.areas[{i}]"
+        if set(a) - {"id", "name", "rings"}:
+            r.err(f"{w}: unexpected keys")
+        if not isinstance(a.get("id"), str) or not AREA_ID_RE.match(a["id"]) or a["id"] in ids:
+            r.err(f"{w}.id: must be a unique ISO code like IE-CO or GB-NIR")
+        ids.add(a.get("id"))
+        _text(r, w + ".name", a.get("name"), 40)
+        rings = a.get("rings") or []
+        if not (1 <= len(rings) <= 50):
+            r.err(f"{w}.rings: between 1 and 50 rings required")
+        for j, ring in enumerate(rings):
+            if not isinstance(ring, str) or len(ring) > 40_000 or not RING_RE.match(ring):
+                r.err(f"{w}.rings[{j}]: must be comma-separated integers only")
+                continue
+            if ring.count(",") % 2 == 0 or ring.count(",") < 7:
+                r.err(f"{w}.rings[{j}]: needs an even count of at least 8 numbers")
+                continue
+            for x, y in decode_ring(ring, m["unit"]):
+                if not (-5 <= x <= m["width"] + 5 and -5 <= y <= m["height"] + 5):
+                    r.err(f"{w}.rings[{j}]: point outside the map bounds")
+                    break
+    return r
+
+
+def check_sites_on_land(data, m, r: Result) -> Result:
+    for p in data.get("polluters", []):
+        for s in p.get("sites", []):
+            if area_at(m, s["lat"], s["lng"]) is None:
+                r.warn(f"Site '{s['name']}' ({p['name']}) does not fall inside any county on the map; check its coordinates")
+    return r
+
+
 def compare(old, new, r: Result) -> Result:
     o = {p["id"]: p for p in old.get("polluters", [])}
     n = {p["id"]: p for p in new.get("polluters", [])}
@@ -208,6 +269,13 @@ def main(argv=None) -> int:
         return 1
 
     r = validate(data)
+    if len(MAP_PATH.read_bytes()) > MAP_MAX_BYTES:
+        r.err("map file too large")
+    else:
+        m = load_json(MAP_PATH)
+        validate_map(m, r)
+        if not r.errors:
+            check_sites_on_land(data, m, r)
     base = None if r.errors else load_baseline(args)
     if base is not None:
         compare(base, data, r)

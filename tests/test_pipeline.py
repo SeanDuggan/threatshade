@@ -170,3 +170,54 @@ class Fetching(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+import build_map  # noqa: E402
+
+
+class CountyMap(unittest.TestCase):
+    def setUp(self):
+        self.m = common.load_json(common.MAP_PATH)
+
+    def test_map_file_is_valid(self):
+        self.assertEqual(validate.validate_map(self.m).errors, [])
+        self.assertEqual(len(self.m["areas"]), 27)  # 26 counties + Northern Ireland
+
+    def test_known_towns_land_in_the_right_county(self):
+        towns = [("Dublin", 53.3498, -6.2603, "Dublin"), ("Cork", 51.8985, -8.4756, "Cork"),
+                 ("Galway", 53.2707, -9.0568, "Galway"), ("Glin", 52.5714, -9.2836, "Limerick"),
+                 ("Tarbert", 52.5728, -9.3753, "Kerry"), ("Kingscourt", 53.9065, -6.8037, "Cavan"),
+                 ("Letterkenny", 54.9558, -7.7342, "Donegal"), ("Waterford", 52.2593, -7.1101, "Waterford")]
+        for name, lat, lng, county in towns:
+            a = common.area_at(self.m, lat, lng)
+            self.assertIsNotNone(a, name)
+            self.assertEqual(a["name"], county, name)
+
+    def test_every_polluter_site_is_on_land(self):
+        for p in data()["polluters"]:
+            for s in p["sites"]:
+                self.assertIsNotNone(common.area_at(self.m, s["lat"], s["lng"]), s["name"])
+
+    def test_map_rejects_markup_and_bad_rings(self):
+        bad = copy.deepcopy(self.m)
+        bad["areas"][0]["rings"][0] = "1,2,3,4,5,6,7,8<script>"
+        self.assertTrue(validate.validate_map(bad).errors)
+        bad = copy.deepcopy(self.m)
+        bad["areas"][0]["name"] = "<img src=x>"
+        self.assertTrue(validate.validate_map(bad).errors)
+        bad = copy.deepcopy(self.m)
+        bad["areas"][0]["onload"] = "x"
+        self.assertTrue(validate.validate_map(bad).errors)
+
+    def test_build_map_from_svg(self):
+        out = build_map.build((ROOT / "tests/fixtures/mini_map.svg").read_text(encoding="utf-8"))
+        self.assertEqual([a["id"] for a in out["areas"]], ["IE-CW"])
+        self.assertEqual(len(out["areas"][0]["rings"]), 2)
+        pts = common.decode_ring(out["areas"][0]["rings"][1], out["unit"])
+        self.assertAlmostEqual(pts[0][0], 480.0)  # relative move after close is from the subpath start
+
+    def test_build_map_refuses_unsafe_svg(self):
+        with self.assertRaises(ValueError):
+            build_map.build('<!DOCTYPE svg [<!ENTITY a "x">]><svg xmlns="http://www.w3.org/2000/svg"/>')
+        with self.assertRaises(ValueError):
+            build_map.parse_path("M 0,0 C 1,1 2,2 3,3 Z")

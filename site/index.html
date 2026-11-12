@@ -43,7 +43,7 @@
   <section class="app wrap" id="scoreboard" aria-label="Map and scoreboard">
     <div class="leftcol">
       <div class="panel">
-        <h2><span>//Damage Map</span><small>marker size = score</small></h2>
+        <h2><span>//Damage Map</span><small>marker size = score · click a county</small></h2>
         <div class="mapbox">
           <svg id="map" role="img" aria-label="Map of Ireland showing scored polluter sites"></svg>
           <div class="tooltip" id="tip" role="status"></div>
@@ -62,6 +62,7 @@
       <h2><span>//Scoreboard</span><small id="count"></small></h2>
       <div class="controls">
         <div class="chips" id="chips" role="group" aria-label="Filter by sector"></div>
+        <div class="chips" id="countyfilter" aria-live="polite"></div>
         <details class="tune">
           <summary>Tune the scoring: what matters most to you?</summary>
           <div class="sliders" id="sliders"></div>
@@ -88,7 +89,7 @@
     </table>
     </div>
     <p class="tiers">Threat levels: <b class="c-crit">Critical</b> 50+, <b class="c-high">High</b> 35 to 49, <b class="c-elev">Elevated</b> 22 to 34, <b class="c-watch">Watch</b> under 22. Carbon figures are 2025 EU ETS data where published, otherwise the latest available year (marked).</p>
-    <div class="disclaimer"><b>Read this first.</b> The Damage Score is an indicative index put together from public records. It is not a legal finding or an official EPA rating. A low score does not mean a polluter is harmless; it can just mean less is published about it. Map positions marked "approx." show the town or county, not the exact site. Several operators listed have since invested in fixes, and Moneypoint stopped burning coal in June 2025. Spotted pollution? Report it to the EPA at <a href="https://www.epa.ie/" rel="noopener noreferrer">epa.ie</a> or LoCall 0818 335599.</div>
+    <div class="disclaimer"><b>Read this first.</b> The Damage Score is an indicative index put together from public records. It is not a legal finding or an official EPA rating. A low score does not mean a polluter is harmless; it can just mean less is published about it. Map positions marked "approx." show the town or county, not the exact site. County boundaries come from the <a href="https://mapsvg.com/maps/ireland/" rel="noopener noreferrer">MapSVG Ireland map</a> (CC0). Several operators listed have since invested in fixes, and Moneypoint stopped burning coal in June 2025. Spotted pollution? Report it to the EPA at <a href="https://www.epa.ie/" rel="noopener noreferrer">epa.ie</a> or LoCall 0818 335599.</div>
   </div></section>
 
   <section class="wrap sources" id="sources">
