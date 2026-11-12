@@ -1,4 +1,3 @@
-"""Run with: python3 -m unittest discover -s tests -v"""
 import copy
 import json
 import re
@@ -9,9 +8,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
-import common  # noqa: E402
-import fetch_updates  # noqa: E402
-import validate  # noqa: E402
+import common
+import fetch_updates
+import validate
 
 
 def data():
@@ -62,7 +61,6 @@ class DataFile(unittest.TestCase):
         self.assertNotIn("https://", csp)
 
     def test_no_markdown_in_published_site(self):
-        # site/ is the Cloudflare Pages output directory; repo docs must never be published.
         found = [str(p.relative_to(ROOT)) for p in (ROOT / "site").rglob("*")
                  if p.is_file() and p.suffix.lower() in (".md", ".markdown", ".mdx")]
         self.assertEqual(found, [], "Markdown files must not be in site/")
@@ -119,7 +117,6 @@ class Fetching(unittest.TestCase):
 
     def test_only_exact_unqualified_names_change_status(self):
         self.assertEqual(common.match_kind("North Cork Co-Op Creameries", "North Cork Co-Op Creameries Limited"), "exact")
-        # A different site of the same company must not be applied automatically.
         self.assertEqual(common.match_kind("Kingspan (Kingscourt)", "Kingspan Insulation Ltd"), "possible")
         self.assertEqual(common.match_kind("Kingspan (Kingscourt)", "Kingspan Limited"), "possible")
         self.assertEqual(common.match_kind("Kerry Ingredients", "Kerry Ingredients Listowel"), "possible")
@@ -175,7 +172,7 @@ if __name__ == "__main__":
     unittest.main()
 
 
-import build_map  # noqa: E402
+import build_map
 
 
 class CountyMap(unittest.TestCase):
@@ -184,7 +181,7 @@ class CountyMap(unittest.TestCase):
 
     def test_map_file_is_valid(self):
         self.assertEqual(validate.validate_map(self.m).errors, [])
-        self.assertEqual(len(self.m["areas"]), 27)  # 26 counties + Northern Ireland
+        self.assertEqual(len(self.m["areas"]), 27)
 
     def test_known_towns_land_in_the_right_county(self):
         towns = [("Dublin", 53.3498, -6.2603, "Dublin"), ("Cork", 51.8985, -8.4756, "Cork"),
@@ -217,7 +214,7 @@ class CountyMap(unittest.TestCase):
         self.assertEqual([a["id"] for a in out["areas"]], ["IE-CW"])
         self.assertEqual(len(out["areas"][0]["rings"]), 2)
         pts = common.decode_ring(out["areas"][0]["rings"][1], out["unit"])
-        self.assertAlmostEqual(pts[0][0], 480.0)  # relative move after close is from the subpath start
+        self.assertAlmostEqual(pts[0][0], 480.0)
 
     def test_build_map_refuses_unsafe_svg(self):
         with self.assertRaises(ValueError):

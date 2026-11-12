@@ -1,19 +1,4 @@
 #!/usr/bin/env python3
-"""Convert the MapSVG Ireland map into site/data/ireland-map.json.
-
-Only run this when you want to refresh the map geometry. The output is committed, so the
-site never loads third-party SVG markup: the app draws counties itself from integer rings.
-
-Download the source first (CC0 1.0, no attribution required):
-    https://mapsvg.com/maps/geo-calibrated/ireland.svg
-
-Usage:
-    python3 scripts/build_map.py path/to/ireland.svg
-
-Safety: the SVG is treated as untrusted. DOCTYPE/ENTITY declarations are refused (no entity
-expansion), the file size is capped, and only <path> id/title/d attributes are read. Path data
-may contain only move/line/close commands; anything else (curves, arcs, script) is rejected.
-"""
 from __future__ import annotations
 
 import math
@@ -22,11 +7,11 @@ import sys
 import xml.etree.ElementTree as ET
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
-from common import MAP_PATH, write_json  # noqa: E402
+from common import MAP_PATH, write_json
 
 MAX_BYTES = 2_000_000
-UNIT = 0.2          # output quantum in SVG pixels
-TOLERANCE = 0.6     # Douglas-Peucker tolerance in SVG pixels
+UNIT = 0.2
+TOLERANCE = 0.6
 SVG_NS = "{http://www.w3.org/2000/svg}"
 MAPSVG_NS = "{http://mapsvg.com}"
 TOKEN = re.compile(r"[MmLlZz]|-?(?:\d+\.?\d*|\.\d+)(?:[eE]-?\d+)?")
@@ -136,7 +121,7 @@ def build(svg_text: str) -> dict:
 
 def main(argv) -> int:
     if len(argv) != 2:
-        print(__doc__)
+        print("usage: python3 scripts/build_map.py path/to/ireland.svg")
         return 2
     with open(argv[1], encoding="utf-8") as f:
         data = build(f.read())

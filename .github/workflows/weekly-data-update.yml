@@ -1,13 +1,11 @@
-# Weekly public-data refresh. Opens a pull request; never publishes directly.
-# A human reviews and merges. Cloudflare Pages deploys only from the main branch.
 name: weekly-data-update
 
 on:
   schedule:
-    - cron: "17 5 * * 1"   # Mondays 05:17 UTC
+    - cron: "17 5 * * 1"
   workflow_dispatch: {}
 
-permissions: {}            # nothing by default; the job below asks for only what it needs
+permissions: {}
 
 concurrency:
   group: weekly-data-update
@@ -18,12 +16,12 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
-      contents: write        # push the update branch
-      pull-requests: write   # open the pull request
-      actions: write         # start the validate workflow on the new branch
+      contents: write
+      pull-requests: write
+      actions: write
     steps:
       - name: Check out (credentials not stored in .git/config)
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
 
@@ -41,8 +39,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          # git status (not git diff) so new, untracked state files count as a change.
-          # Otherwise the baseline in data/state is never saved and new prosecutions are never reported.
           if [ -z "$(git status --porcelain --untracked-files=all -- site/data data/state)" ]; then
             echo "No data changes this week."
             cat reports/update-report.md >> "$GITHUB_STEP_SUMMARY"
@@ -59,5 +55,4 @@ jobs:
           gh pr create --base main --head "$branch" \
             --title "Weekly data refresh $(date -u +%F)" \
             --body-file reports/update-report.md
-          # The PR above does not trigger the validate workflow, so start it on the branch.
           gh workflow run validate-pr.yml --ref "$branch"

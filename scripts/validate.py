@@ -1,15 +1,4 @@
 #!/usr/bin/env python3
-"""Validate site/data/data.json before it can be published.
-
-Hard errors (exit 1): anything malformed, out of range, or unsafe to render.
-Warnings (exit 0, written to the report): big score swings, added or removed polluters,
-which a human must look at before merging.
-
-Usage:
-  python3 scripts/validate.py                       # validate only
-  python3 scripts/validate.py --baseline old.json   # also compare against a previous version
-  python3 scripts/validate.py --baseline-ref HEAD   # compare against the committed version (git)
-"""
 from __future__ import annotations
 
 import argparse
@@ -20,7 +9,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
-from common import (DATA_PATH, MAP_PATH, REPORT_PATH, RING_RE, ROOT, allowlist, area_at,  # noqa: E402
+from common import (DATA_PATH, MAP_PATH, REPORT_PATH, RING_RE, ROOT, allowlist, area_at,
                     decode_ring, host_allowed, load_json, score)
 
 SECTORS = {"Water utility", "Dairy & food", "Chemicals", "Heavy industry", "Power", "Aviation",
@@ -150,7 +139,6 @@ def validate(data, r: Result | None = None) -> Result:
 
     if r.errors:
         return r
-    # every source should be used at least once (orphans are a sign of a bad edit)
     used = {x["source"] for p in pol for x in p["evidence"]}
     for sid in sorted(src_ids - used):
         r.warn(f"source {sid} is not cited by any polluter")
@@ -162,7 +150,6 @@ MAP_MAX_BYTES = 300_000
 
 
 def validate_map(m, r: Result | None = None) -> Result:
-    """The county map is third-party geometry: allow only ids, names and integer rings."""
     r = r or Result()
     if not isinstance(m, dict):
         r.err("map: top level must be an object")
@@ -239,7 +226,7 @@ def load_baseline(args):
     if args.baseline:
         return load_json(args.baseline)
     if args.baseline_ref:
-        if not re.match(r"^[A-Za-z0-9._][A-Za-z0-9._/-]{0,99}$", args.baseline_ref):  # no leading "-": git would read it as an option
+        if not re.match(r"^[A-Za-z0-9._][A-Za-z0-9._/-]{0,99}$", args.baseline_ref):
             raise SystemExit("invalid --baseline-ref")
         rel = DATA_PATH.relative_to(ROOT).as_posix()
         out = subprocess.run(["git", "show", f"{args.baseline_ref}:{rel}"], cwd=ROOT,

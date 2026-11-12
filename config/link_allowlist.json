@@ -1,5 +1,4 @@
 {
-  "_comment": "Hosts that source links may point to. Keep in sync with ALLOWED_LINK_HOSTS in site/app.js (a test checks this).",
   "link_hosts": [
     "epa.ie",
     "irishtimes.com",

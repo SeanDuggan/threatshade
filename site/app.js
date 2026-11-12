@@ -1,12 +1,5 @@
-/* Threatshade polluter scoreboard.
- * Security notes:
- *  - All data from data/data.json is rendered with textContent or DOM APIs, never innerHTML.
- *  - Source links must be https:// and on an allowlisted host (checked again here, defence in depth).
- *  - No inline styles or scripts, so the Content-Security-Policy can forbid both.
- */
 (function () {
   "use strict";
-
   var DATA_URL = "data/data.json";
   var MAP_URL = "data/ireland-map.json";
   var ALLOWED_LINK_HOSTS = [
@@ -15,8 +8,6 @@
     "fisheriesireland.ie", "catchments.ie", "agriland.ie", "europa.eu",
     "bnm.ie", "leinsterexpress.ie"
   ];
-
-  /* ---------- small DOM helpers ---------- */
   var NS = "http://www.w3.org/2000/svg";
   function h(tag, attrs, children) {
     var e = document.createElement(tag);
@@ -35,7 +26,6 @@
     return e;
   }
   function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
-
   function safeUrl(u) {
     try {
       var url = new URL(u);
@@ -46,8 +36,6 @@
     } catch (e) { return null; }
   }
   function num(v, lo, hi) { return typeof v === "number" && isFinite(v) && v >= lo && v <= hi; }
-
-  /* ---------- scoring ---------- */
   var CATS = [
     { k: "climate", label: "Climate", max: 30 },
     { k: "water", label: "Water", max: 25 },
@@ -87,8 +75,6 @@
     (p.extra_badges || []).forEach(function (x) { b.push([x.label, !!x.alert]); });
     return b;
   }
-
-  /* ---------- basic shape check on load (the build pipeline validates fully) ---------- */
   function checkData(d) {
     if (!d || !Array.isArray(d.polluters) || !Array.isArray(d.sources)) throw new Error("bad shape");
     d.polluters.forEach(function (p) {
@@ -98,8 +84,6 @@
     });
     return d;
   }
-
-  /* ---------- map geometry: MapSVG Ireland (CC0), see data/ireland-map.json ---------- */
   var MAP = null, W = 0, H = 0, AREAS = [];
   function merc(lat) { return Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)); }
   function proj(lng, lat) {
@@ -138,11 +122,8 @@
     });
     return m;
   }
-
-  /* ---------- app ---------- */
   var P = [], SOURCES = {}, sectorFilter = "All", countyFilter = null, selected = null;
   var svg, markers, tip, board, rowEls = {}, countyEls = {};
-
   function drawBaseMap() {
     svg = document.getElementById("map");
     svg.setAttribute("viewBox", "-6 -6 " + (W + 12).toFixed(0) + " " + (H + 12).toFixed(0));
@@ -175,17 +156,14 @@
     if (ni) { var c = proj(-6.75, 54.62); s("text", { x: c[0], y: c[1], "class": "ni-label", "text-anchor": "middle" }, svg).textContent = "N. IRELAND"; }
     markers = s("g", {}, svg);
     tip = document.getElementById("tip");
-
     var legend = document.getElementById("legend");
     [["Critical 50+", "crit"], ["High 35–49", "high"], ["Elevated 22–34", "elev"], ["Watch <22", "watch"]].forEach(function (l) {
       legend.appendChild(h("span", null, [h("i", { "class": "bg-" + l[1] }), l[0]]));
     });
     legend.appendChild(h("span", { "class": "legend-note", text: "County shading = worst score in that county. Click a county to filter." }));
   }
-
   function inCounty(p) { return !countyFilter || p.counties.indexOf(countyFilter) >= 0; }
   function visible(p) { return (sectorFilter === "All" || p.sector === sectorFilter) && inCounty(p); }
-
   function shadeCounties() {
     Object.keys(countyEls).forEach(function (id) {
       var worst = -1, n = 0;
@@ -196,7 +174,6 @@
       el.setAttribute("aria-pressed", String(countyFilter === id));
     });
   }
-
   function setCounty(id) {
     countyFilter = id;
     var box = document.getElementById("countyfilter"); clear(box);
@@ -211,7 +188,6 @@
     }
     render();
   }
-
   function drawMarkers() {
     clear(markers);
     P.slice().sort(function (a, b) { return scoreOf(a) - scoreOf(b); }).forEach(function (p) {
@@ -239,7 +215,6 @@
       });
     });
   }
-
   function buildControls() {
     var sectors = ["All"];
     P.forEach(function (p) { if (sectors.indexOf(p.sector) < 0) sectors.push(p.sector); });
@@ -265,7 +240,6 @@
       render();
     });
   }
-
   function buildRows() {
     board = document.getElementById("board");
     P.forEach(function (p) {
@@ -275,7 +249,6 @@
       rowEls[p.id] = li;
     });
   }
-
   function renderBoard() {
     var first = {};
     Object.keys(rowEls).forEach(function (id) { if (rowEls[id].parentNode) first[id] = rowEls[id].getBoundingClientRect().top; });
@@ -305,7 +278,6 @@
       requestAnimationFrame(function () { requestAnimationFrame(function () { li.style.transition = "transform .45s cubic-bezier(.2,.7,.2,1)"; li.style.transform = ""; }); });
     });
   }
-
   function renderDossier() {
     var p = P.filter(function (x) { return x.id === selected; })[0];
     var box = document.getElementById("dossier"); clear(box);
@@ -331,7 +303,6 @@
     if (p.note) right.appendChild(h("div", { "class": "note", text: p.note }));
     box.appendChild(right);
   }
-
   function renderSources() {
     var ol = document.getElementById("srcs"); clear(ol);
     Object.keys(SOURCES).map(Number).sort(function (a, b) { return a - b; }).forEach(function (id) {
@@ -341,10 +312,8 @@
       ol.appendChild(li);
     });
   }
-
   function select(id) { selected = id; render(); }
   function render() { renderBoard(); shadeCounties(); drawMarkers(); renderDossier(); }
-
   function start(d, m) {
     checkData(d);
     MAP = checkMap(m); W = MAP.width; H = MAP.height;
@@ -361,13 +330,11 @@
     document.getElementById("reviewed").textContent = d.last_reviewed || "unknown";
     drawBaseMap(); buildControls(); buildRows(); renderSources(); render();
   }
-
   function fail(err) {
     var b = document.getElementById("board"); clear(b);
     b.appendChild(h("li", { "class": "empty", text: "The scoreboard data could not be loaded. Try refreshing the page." }));
     if (window.console) console.error(err);
   }
-
   document.addEventListener("DOMContentLoaded", function () {
     function get(url) { return fetch(url, { credentials: "same-origin" }).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }); }
     Promise.all([get(DATA_URL), get(MAP_URL)])

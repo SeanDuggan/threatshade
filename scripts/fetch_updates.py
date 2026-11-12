@@ -1,19 +1,4 @@
 #!/usr/bin/env python3
-"""Weekly data refresh. Standard library only, so there are no third-party packages to compromise.
-
-What it does:
-  1. EPA National Priority Sites list -> updates enforcement.nps for polluters already on the board,
-     and reports listed sites that are not on the board (a human decides whether to add them).
-  2. EPA prosecutions index for this year and last -> reports prosecutions not seen before.
-     Never changes scores by itself: a human reads the case and edits data.json.
-  3. EPA LEAP open-data API -> records compliance-record counts for known licences and reports changes.
-
-Everything fetched is treated as untrusted: only allowlisted https hosts, size and time limits,
-no redirects off the allowlist, strict parsing, and sanity bounds. If a source looks wrong
-(for example a page redesign returns zero rows) the step is skipped and reported, never applied.
-
-Writes: site/data/data.json (only the nps field), data/state/*.json, reports/update-report.md
-"""
 from __future__ import annotations
 
 import datetime as dt
@@ -27,7 +12,7 @@ import urllib.request
 from html.parser import HTMLParser
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
-from common import DATA_PATH, REPORT_PATH, STATE_DIR, allowlist, host_allowed, load_json, match_kind, names_match, write_json  # noqa: E402
+from common import DATA_PATH, REPORT_PATH, STATE_DIR, allowlist, host_allowed, load_json, match_kind, names_match, write_json
 
 NPS_URL = "https://www.epa.ie/our-services/compliance--enforcement/whats-happening/national-priority-sites-list"
 PROS_URL = "https://www.epa.ie/our-services/compliance--enforcement/whats-happening/prosecutions-and-penalties/prosecutions-{year}/"
@@ -37,7 +22,7 @@ LEAP_COMPLIANCE = "https://data.epa.ie/leap/api/v1/ComplianceList/compliancelist
 USER_AGENT = "ThreatshadeDataBot/1.0 (+https://www.threatshade.com; weekly public-data refresh)"
 MAX_BYTES = 3_000_000
 TIMEOUT = 25
-PAUSE = 1.5  # seconds between requests, to be polite
+PAUSE = 1.5
 UUID_RE = re.compile(r"^[0-9a-fA-F-]{36}$")
 
 FETCH_HOSTS = allowlist()["fetch_hosts"]
@@ -50,11 +35,6 @@ def say(line: str = "") -> None:
 
 
 def md_text(text) -> str:
-    """Show fetched (untrusted) text literally in the Markdown report, which becomes the PR body.
-
-    Inside a code span GitHub renders no links, images, HTML or @mentions. Backticks and
-    line breaks are removed so the text cannot close the span early.
-    """
     t = re.sub(r"[\s`]+", " ", str(text)).strip()[:300]
     return f"`{t}`" if t else "`(blank)`"
 
@@ -63,7 +43,6 @@ _SAFE_URL = re.compile(r"https://(www\.)?epa\.ie/[A-Za-z0-9._~/%-]*")
 
 
 def md_url(url: str) -> str:
-    """A clickable link only for plain epa.ie URLs; anything else is shown as literal text."""
     return f"<{url}>" if _SAFE_URL.fullmatch(url) else md_text(url)
 
 
@@ -89,9 +68,7 @@ def fetch(url: str, accept: str) -> bytes:
     return body
 
 
-# ---------------------------------------------------------------- 1. priority sites
 class _TableParser(HTMLParser):
-    """Collects table rows as lists of cell text, plus all heading text."""
 
     def __init__(self):
         super().__init__(convert_charrefs=True)
@@ -144,7 +121,7 @@ def step_priority_sites(data: dict) -> bool:
     say("### EPA National Priority Sites")
     try:
         nps = parse_nps(fetch(NPS_URL, "text/html").decode("utf-8", "replace"))
-    except Exception as e:  # noqa: BLE001 - report and skip, never crash the whole run
+    except Exception as e:
         say(f"- SKIPPED: could not fetch or parse the list ({type(e).__name__}: {md_text(e)})")
         return False
     n = len(nps["sites"])
@@ -161,7 +138,6 @@ def step_priority_sites(data: dict) -> bool:
         if "exact" in kinds:
             new = "current"
         elif kinds:
-            # Only a loose match: never change a public claim automatically, in either direction.
             for s in nps["sites"]:
                 if match_kind(p["name"], s["licensee"]):
                     say(f"- POSSIBLE MATCH, not applied (status stays {cur}): board entry {md_text(p['name'])} "
@@ -183,7 +159,6 @@ def step_priority_sites(data: dict) -> bool:
     return changed
 
 
-# ---------------------------------------------------------------- 2. prosecutions
 class _LinkParser(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
@@ -217,7 +192,7 @@ def step_prosecutions() -> None:
         try:
             lp = _LinkParser()
             lp.feed(fetch(url, "text/html").decode("utf-8", "replace"))
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             say(f"- SKIPPED {y}: {type(e).__name__}: {md_text(e)}")
             continue
         for href, text in lp.links:
@@ -241,7 +216,6 @@ def step_prosecutions() -> None:
         say("- No new prosecutions.")
 
 
-# ---------------------------------------------------------------- 3. LEAP API
 def _first_list(obj):
     if isinstance(obj, list):
         return obj
@@ -288,7 +262,7 @@ def step_leap(data: dict) -> None:
                     say(f"- {reg} ({p['name']}): unexpected response shape; skipped.")
                     continue
                 count = len(items)
-            except Exception as e:  # noqa: BLE001
+            except Exception as e:
                 say(f"- {reg} ({p['name']}): SKIPPED ({type(e).__name__})")
                 continue
             now[reg] = count

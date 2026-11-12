@@ -1,4 +1,3 @@
-"""Shared helpers for the Threatshade data pipeline. Standard library only."""
 from __future__ import annotations
 
 import json
@@ -29,7 +28,7 @@ def write_json(path: Path, obj) -> None:
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2, ensure_ascii=False)
         f.write("\n")
-    tmp.replace(path)  # atomic on the same filesystem
+    tmp.replace(path)
 
 
 def allowlist() -> dict:
@@ -47,7 +46,6 @@ def host_allowed(url: str, hosts: list[str]) -> bool:
     return any(h == a or h.endswith("." + a) for a in hosts)
 
 
-# ---- scoring: must mirror site/app.js (tests check both agree on known values) ----
 def climate_pts(tonnes) -> float:
     if not tonnes:
         return 0.0
@@ -74,7 +72,6 @@ def score(p: dict) -> float:
     return sum(pts.values()) / sum(CATS.values()) * 100
 
 
-# ---- name matching for EPA lists ----
 _SUFFIXES = re.compile(r"\b(limited|ltd|unlimited company|unlimited|plc|dac|company|co-operative|co-op|coop|society|the)\b")
 
 
@@ -87,8 +84,6 @@ def norm_name(s: str) -> str:
 
 
 def names_match(a: str, b: str) -> bool:
-    """Loose match: same name, or one name is the start of the other. Used only to decide
-    whether a listed site is already covered by the board (for reporting), never to change data."""
     na, nb = norm_name(a), norm_name(b)
     if not na or not nb:
         return False
@@ -96,15 +91,6 @@ def names_match(a: str, b: str) -> bool:
 
 
 def match_kind(board_name: str, listed_name: str) -> str | None:
-    """How confidently a board entry matches a name on an EPA list.
-
-    "exact":    same name after normalising, and the board name has no "(...)" qualifier.
-                Only this is safe to act on automatically.
-    "possible": a loose match, or the board entry is qualified to one site or owner
-                (e.g. "Kingspan (Kingscourt)"), so a different site of the same company could
-                be the one listed. A human must check.
-    None:       no match.
-    """
     if not names_match(board_name, listed_name):
         return None
     if norm_name(board_name) == norm_name(listed_name) and "(" not in board_name:
@@ -112,13 +98,11 @@ def match_kind(board_name: str, listed_name: str) -> str | None:
     return "possible"
 
 
-# ---- county map (site/data/ireland-map.json) ----
 MAP_PATH = ROOT / "site" / "data" / "ireland-map.json"
 RING_RE = re.compile(r"^-?\d{1,5}(,-?\d{1,5})*$")
 
 
 def decode_ring(ring: str, unit: float) -> list[tuple[float, float]]:
-    """Delta-encoded integer ring -> list of (x, y) in SVG pixels."""
     nums = [int(v) for v in ring.split(",")]
     pts, x, y = [], 0, 0
     for i in range(0, len(nums) - 1, 2):
@@ -132,8 +116,6 @@ def _merc(lat: float) -> float:
 
 
 def project(m: dict, lat: float, lng: float) -> tuple[float, float]:
-    """Lat/lng -> SVG pixels. The MapSVG file is Web Mercator within its geo bounds
-    (checked against 33 towns: all inland ones land in the right county). Mirrors projFor() in app.js."""
     g = m["geo_bounds"]
     x = (lng - g["west"]) / (g["east"] - g["west"]) * m["width"]
     y = (_merc(g["north"]) - _merc(lat)) / (_merc(g["north"]) - _merc(g["south"])) * m["height"]
@@ -152,7 +134,6 @@ def point_in_ring(x: float, y: float, pts) -> bool:
 
 
 def area_at(m: dict, lat: float, lng: float):
-    """Return the area (county) dict containing the point, or None (e.g. offshore)."""
     x, y = project(m, lat, lng)
     for a in m["areas"]:
         if any(point_in_ring(x, y, decode_ring(r, m["unit"])) for r in a["rings"]):
