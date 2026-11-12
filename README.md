@@ -9,6 +9,7 @@ The site has no server, database, login or forms. It is plain HTML, CSS and Java
 ```
 site/                    What gets deployed (Cloudflare Pages output directory)
   index.html             Page markup; no inline scripts or styles
+  404.html               Shown for unknown URLs (Cloudflare Pages returns it with a 404 status)
   styles.css             All styling
   app.js                 Scoring, map and scoreboard; renders data with DOM APIs only
   data/data.json         The polluters, scores inputs, evidence and sources

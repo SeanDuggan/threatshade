@@ -46,10 +46,13 @@ class DataFile(unittest.TestCase):
             self.assertNotIn(bad, code)
 
     def test_html_has_no_inline_script_or_style(self):
-        html = (ROOT / "site/index.html").read_text(encoding="utf-8")
-        self.assertIsNone(re.search(r"<script(?![^>]*\bsrc=)", html))
-        self.assertNotIn("style=", html)
-        self.assertNotIn("<style", html)
+        pages = sorted((ROOT / "site").rglob("*.html"))
+        self.assertIn(ROOT / "site/404.html", pages)
+        for page in pages:
+            html = page.read_text(encoding="utf-8")
+            self.assertIsNone(re.search(r"<script(?![^>]*\bsrc=)", html), page.name)
+            self.assertNotIn("style=", html, page.name)
+            self.assertNotIn("<style", html, page.name)
 
     def test_no_third_party_hosts_in_page_or_csp(self):
         html = (ROOT / "site/index.html").read_text(encoding="utf-8")
