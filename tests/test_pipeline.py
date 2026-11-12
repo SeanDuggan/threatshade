@@ -256,3 +256,14 @@ class SitkaGrid(unittest.TestCase):
 
     def test_build_only_contacts_allowlisted_host(self):
         self.assertTrue(common.host_allowed(build_sitka.LAYER, common.allowlist()["fetch_hosts"]))
+
+
+class PageLinks(unittest.TestCase):
+    def test_external_links_in_pages_are_https_and_allowlisted(self):
+        hosts = common.allowlist()["link_hosts"]
+        for page in sorted((ROOT / "site").rglob("*.html")):
+            html = page.read_text(encoding="utf-8")
+            for url in re.findall(r'href="(https?://[^"]+)"', html):
+                self.assertTrue(common.host_allowed(url.replace("&amp;", "&"), hosts), f"{page.name}: {url}")
+            for tag in re.findall(r'<a [^>]*href="https?://[^>]*>', html):
+                self.assertIn('rel="noopener noreferrer"', tag, page.name)

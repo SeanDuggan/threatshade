@@ -7,7 +7,7 @@
     "epa.ie", "irishtimes.com", "irishexaminer.com", "smartwatermagazine.com",
     "sustainabilityonline.net", "farmersjournal.ie", "donegallive.ie",
     "fisheriesireland.ie", "catchments.ie", "agriland.ie", "europa.eu",
-    "bnm.ie", "leinsterexpress.ie", "data.gov.ie"
+    "bnm.ie", "leinsterexpress.ie", "data.gov.ie", "ucc.ie", "mapsvg.com"
   ];
   var NS = "http://www.w3.org/2000/svg";
   function h(tag, attrs, children) {
@@ -187,7 +187,7 @@
     keyEl.appendChild(swatches);
     var url = safeUrl(g.source_url);
     keyEl.appendChild(h("p", null, [
-      "Coillte forest where Sitka spruce is the main species, added up in squares of about 5 km (" + Math.round(g.total_ha).toLocaleString("en-IE") + " ha in total). Private forests are not included yet. Source: ",
+      "Coillte forest where Sitka spruce is the main species, added up in squares of about 5 km (" + Math.round(g.total_ha).toLocaleString("en-IE") + " ha in total). Source: ",
       url ? h("a", { href: url, rel: "noopener noreferrer", text: g.source }) : g.source,
       ", fetched " + g.fetched + "."
     ]));
@@ -197,7 +197,10 @@
       btn.setAttribute("aria-pressed", String(on));
       btn.textContent = on ? "Hide Sitka spruce plantations" : "Show Sitka spruce plantations";
       sitkaLayer.setAttribute("class", "sitka" + (on ? " on" : ""));
-      if (on) keyEl.removeAttribute("hidden"); else keyEl.setAttribute("hidden", "hidden");
+      [keyEl, document.getElementById("sitka-about")].forEach(function (el) {
+        if (!el) return;
+        if (on) el.removeAttribute("hidden"); else el.setAttribute("hidden", "hidden");
+      });
     });
     legend.insertBefore(keyEl, legend.firstChild);
     legend.insertBefore(btn, legend.firstChild);

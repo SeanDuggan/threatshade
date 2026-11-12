@@ -184,3 +184,10 @@ footer a{color:#f9f9f9}
 .sitka-key p{margin:6px 0 0}
 .sitka-swatches{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .sitka-swatches i.sw{display:inline-block;width:12px;height:12px;border-radius:0;margin-right:5px;vertical-align:-2px}
+.sitka-about{padding:4px 16px 16px;font-size:13px;border-top:1px solid var(--line)}
+.sitka-about[hidden]{display:none}
+.sitka-about h3{font-family:var(--display);color:#1f6b3a;font-size:16px;margin:12px 0 6px}
+.sitka-about p{margin:0 0 8px}
+.sitka-about ul{margin:0;padding-left:18px}
+.sitka-about li{margin:0 0 8px}
+.sitka-about a{color:#1f6b3a}

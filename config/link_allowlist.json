@@ -13,7 +13,9 @@
     "europa.eu",
     "bnm.ie",
     "leinsterexpress.ie",
-    "data.gov.ie"
+    "data.gov.ie",
+    "ucc.ie",
+    "mapsvg.com"
   ],
   "fetch_hosts": [
     "www.epa.ie",
