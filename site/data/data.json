@@ -166,6 +166,21 @@
       "id": 33,
       "title": "EPA: Ireland's State of the Environment Report 2024, climate chapter (LULUCF)",
       "url": "https://epawebapp.epa.ie/ebooks/soe2024/102/"
+    },
+    {
+      "id": 34,
+      "title": "Irish Times: Dairy processor fined for illegal effluent discharge into Blackwater river tributary (Apr 2026)",
+      "url": "https://www.irishtimes.com/ireland/2026/04/21/dairy-processor-fined-for-illegal-effluent-discharge-into-blackwater-river-tributary/"
+    },
+    {
+      "id": 35,
+      "title": "Inland Fisheries Ireland: IFI welcomes court ruling regarding Tirlán water pollution incident in Co Monaghan (Apr 2025)",
+      "url": "https://www.fisheriesireland.ie/news/media-releases/ifi-welcomes-court-ruling-regarding-tirlan-water-pollution-incident-in-co"
+    },
+    {
+      "id": 36,
+      "title": "Irish Times: ESB to decommission Derrybrien wind farm's 70 turbines (Mar 2022)",
+      "url": "https://www.irishtimes.com/business/energy-and-resources/esb-to-decommission-derrybrien-wind-farm-s-70-turbines-1.4828766"
     }
   ],
   "polluters": [
@@ -448,7 +463,7 @@
       },
       "enforcement": {
         "nps": "current",
-        "prosecutions": 1,
+        "prosecutions": 2,
         "stop_orders": 0,
         "big_fine": false
       },
@@ -470,6 +485,11 @@
           "date": "Q2 2026",
           "text": "On the EPA's National Priority Sites list for emissions to water and how it runs its wastewater treatment plant.",
           "source": 3
+        },
+        {
+          "date": "Apr 2026",
+          "text": "Pleaded guilty at Mallow District Court to polluting the River Allow, a Blackwater tributary, from its wastewater treatment plant on 22 June 2025. Fined €8,000 plus €3,650 costs. Sewage fungus coated the riverbed for 450 m; no fish were killed by this discharge. The EPA had suspended its licence to discharge to the Allow. The co-op said it had spent €1m on remedial works and that there was no causal link to the August 2025 Blackwater fish kill, whose cause has not been identified.",
+          "source": 34
         },
         {
           "date": "2025",
@@ -678,6 +698,11 @@
           "date": "Jun 2025",
           "text": "Moneypoint stopped burning coal, cutting the station's emissions by 49%.",
           "source": 1
+        },
+        {
+          "date": "2003–2022",
+          "text": "In October 2003 a peat slide during construction of ESB's Derrybrien wind farm in Co Galway moved about 250,000 tonnes of peat; Inland Fisheries Ireland estimated about 50,000 fish died along 18 km of river. The EU Court of Justice fined the State (not ESB) because no environmental impact assessment was done. In 2022 An Bord Pleanála refused substitute consent to ESB subsidiary Gort Windfarms, and ESB decided to decommission all 70 turbines. Background only: not counted in the score.",
+          "source": 36
         }
       ],
       "note": null,
@@ -1199,19 +1224,19 @@
     },
     {
       "id": "tirlan",
-      "name": "Tirlán (Virginia)",
+      "name": "Tirlán (Virginia, Lough Egish)",
       "sector": "Dairy & food",
       "co2_tonnes": 23808,
       "co2_year": 2023,
       "co2_estimated": false,
       "points": {
-        "water": 0,
+        "water": 12,
         "air": 0,
         "habitat": 8
       },
       "enforcement": {
         "nps": null,
-        "prosecutions": 0,
+        "prosecutions": 1,
         "stop_orders": 0,
         "big_fine": false
       },
@@ -1226,9 +1251,19 @@
           "name": "Virginia, Co Cavan",
           "lat": 53.835,
           "lng": -7.08
+        },
+        {
+          "name": "Lough Egish, Co Monaghan (approx.)",
+          "lat": 54.07,
+          "lng": -6.8
         }
       ],
       "evidence": [
+        {
+          "date": "Apr 2025",
+          "text": "Pleaded guilty at Monaghan District Court after white effluent from its dairy facility at Lough Egish Business Park entered a tributary of the Knappagh River, a brown trout spawning river in the Erne system, on 24 November 2023. The court applied the Probation Act on condition of a €5,000 donation to a local charity; Tirlán paid €15,177 in costs.",
+          "source": 35
+        },
         {
           "date": "2023",
           "text": "Reported 23,808 t CO₂ under the EU ETS.",

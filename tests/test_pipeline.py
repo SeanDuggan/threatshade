@@ -29,7 +29,7 @@ class DataFile(unittest.TestCase):
 
     def test_scores_match_published_page(self):
         d = data()
-        expected = {"uisce": 55, "coillte": 50, "northcork": 46, "aurivo": 43, "ryanair": 34, "bnm": 12}
+        expected = {"uisce": 55, "coillte": 50, "northcork": 49, "aurivo": 43, "ryanair": 34, "bnm": 12}
         for pid, want in expected.items():
             self.assertEqual(round(common.score(by_id(d, pid))), want, pid)
 
