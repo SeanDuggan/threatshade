@@ -209,3 +209,13 @@ footer a{color:#f9f9f9}
 .sitka-about ul{margin:0;padding-left:18px}
 .sitka-about li{margin:0 0 8px}
 .sitka-about a{color:#1f6b3a}
+.srcbox > summary{list-style:none;cursor:pointer}
+.srcbox > summary::-webkit-details-marker{display:none}
+.srcbox > summary h2.sec{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:0}
+.srcbox > summary h2.sec::after{content:"+";order:-1;display:inline-block;width:.7em;font-family:var(--body);font-weight:400}
+.srcbox[open] > summary h2.sec::after{content:"–"}
+.srcbox > summary small{font-family:var(--body);font-size:14px;font-weight:500;color:var(--muted)}
+.srcbox[open] > summary small{visibility:hidden}
+.srcbox > summary:focus-visible{outline:2px solid var(--orange);outline-offset:4px}
+.srcbox[open] ol.srcs{margin-top:16px}
+ol.srcs li.hit{background:#fff3cd;outline:4px solid #fff3cd}

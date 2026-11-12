@@ -361,7 +361,23 @@
       li.appendChild(url ? h("a", { href: url, rel: "noopener noreferrer", text: src.title }) : h("span", { text: src.title + " (link removed: not on allowlist)" }));
       ol.appendChild(li);
     });
+    var n = Object.keys(SOURCES).length;
+    document.getElementById("srccount").textContent = n + " source" + (n === 1 ? "" : "s") + " · show all";
   }
+  function revealSource(hash, scroll) {
+    if (!/^#src-\d+$/.test(hash || "")) return;
+    var li = document.getElementById(hash.slice(1));
+    if (!li) return;
+    document.getElementById("srcbox").open = true;
+    Array.prototype.forEach.call(document.querySelectorAll("ol.srcs li.hit"), function (x) { x.classList.remove("hit"); });
+    li.classList.add("hit");
+    if (scroll) li.scrollIntoView({ block: "center" });
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest ? e.target.closest('a[href^="#src-"]') : null;
+    if (a) revealSource(a.getAttribute("href"), false);
+  });
+  window.addEventListener("hashchange", function () { revealSource(location.hash, true); });
   var narrow = window.matchMedia ? window.matchMedia("(max-width: 980px)") : null;
   function smooth() { return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"; }
   function select(id) {
@@ -383,7 +399,7 @@
     var top = P.slice().sort(function (a, b) { return scoreOf(b) - scoreOf(a); })[0];
     selected = top ? top.id : null;
     document.getElementById("reviewed").textContent = d.last_reviewed || "unknown";
-    drawBaseMap(); buildControls(); buildRows(); renderSources(); render();
+    drawBaseMap(); buildControls(); buildRows(); renderSources(); render(); revealSource(location.hash, true);
     if (sitka) {
       try { drawSitka(checkSitka(sitka)); } catch (e) { if (window.console) console.error(e); }
     }
