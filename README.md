@@ -43,7 +43,7 @@ Then open http://localhost:8000 (`fetch()` does not work from `file://`). Python
 
 See `SECURITY.md` and `docs/THREAT_MODEL.md`. Reports go to security@threatshade.com. The `security.txt` expiry (2027-11-01) must be renewed before then.
 
-Repository settings in place: read-only default workflow token, Actions allowed to open pull requests, Dependabot alerts and security updates, CODEOWNERS. Branch protection and secret scanning need the repository to be public (or GitHub Pro), so turn them on at launch.
+The repository is public. `main` is protected: changes go through a pull request with one approving review from the code owner of the files changed (see `.github/CODEOWNERS`), the `test` check must pass, open review conversations must be resolved, and force pushes and branch deletion are blocked. Also on: secret scanning with push protection, Dependabot alerts and security updates, a read-only default workflow token.
 
 ## Deploy
 
@@ -53,5 +53,4 @@ Cloudflare Pages builds from `main` with no build command and output directory `
 
 - Legal review of every claim, badge and the method wording; keep QA behind Cloudflare Access until then.
 - A corrections and right-of-reply page.
-- Turn on branch protection and secret scanning once the repository is public.
 - Add a licence for the code and data if others should reuse them.
