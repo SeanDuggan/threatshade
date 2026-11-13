@@ -368,11 +368,23 @@
       return h("div", { "class": "cat" }, [label, h("div", { "class": "track" }, [fill]), h("span", { "class": "v", text: v.toFixed(1) + " / " + c.max })]);
     }));
     var big = h("div", { "class": "big c-" + t[1] }, [String(Math.round(sc)), h("small", { text: " / 100" })]);
-    box.appendChild(h("div", null, [
+    var left = h("div", null, [
       h("h3", { text: p.name }),
       h("span", { "class": "tier bg-" + t[1], text: t[0].toUpperCase() + " · RANK " + rank + " OF " + P.length }),
       big, cats
-    ]));
+    ]);
+    var basis = p.points_basis;
+    if (basis && basis.reviewed === true) {
+      var why = h("details", { "class": "why-points" }, [h("summary", { text: "Why these points?" })]);
+      var list = h("ul");
+      [["Water", basis.water], ["Air and odour", basis.air], ["Habitat", basis.habitat]].forEach(function (row) {
+        if (typeof row[1] === "string" && row[1]) list.appendChild(h("li", null, [h("b", { text: row[0] + ": " }), row[1]]));
+      });
+      why.appendChild(list);
+      why.appendChild(h("p", { "class": "why-note", text: "Climate and enforcement points are calculated automatically from the records listed. Numbers in brackets refer to the sources below." }));
+      left.appendChild(why);
+    }
+    box.appendChild(left);
     var ev = h("ul", { "class": "evidence" }, p.evidence.map(function (e) {
       return h("li", null, [h("span", { "class": "d", text: e.date }), e.text + " ", h("a", { href: "#src-" + e.source, text: "[" + e.source + "]" })]);
     }));

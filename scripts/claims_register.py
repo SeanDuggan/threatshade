@@ -84,6 +84,15 @@ class _Text(HTMLParser):
             self.stack[-1][2].append(data)
 
 
+def basis_lines(p) -> list[str]:
+    b = p.get("points_basis")
+    if not b:
+        return ["- **Reasons for hand-set points:** none recorded"]
+    status = "reviewed, shown on the site" if b.get("reviewed") else "DRAFT: not yet reviewed, not shown on the site"
+    return [f"- **Reasons for hand-set points ({status}):**",
+            f"  - Water: {b.get('water')}", f"  - Air and odour: {b.get('air')}", f"  - Habitat: {b.get('habitat')}"]
+
+
 def tier(v: float) -> str:
     return next(name for low, name in TIERS if v >= low)
 
@@ -115,8 +124,9 @@ def build():
                f"{' (estimated)' if p.get('co2_estimated') else ''}{' (' + str(p.get('co2_year')) + ')' if p.get('co2_year') else ''}; "
                f"priority list: {e.get('nps') or 'never'}; prosecutions counted: {e.get('prosecutions', 0)}; "
                f"stop orders: {e.get('stop_orders', 0)}; fine of EUR 100k+: {'yes' if e.get('big_fine') else 'no'}. "
-               "Water, air and habitat points are set by hand; no per-entry reason is recorded.",
+               "Water, air and habitat points are set by hand; the reasons follow.",
                "- **Mapped sites:** " + "; ".join(s["name"] for s in p["sites"]),
+               *basis_lines(p),
                "- **Badges shown:** " + ("; ".join(f"'{n}' ({r})" for n, r in badges) if badges else "none"), ""]
         if p.get("note"):
             md += [f"- **Note shown on the page:** {p['note']}", ""]
@@ -132,6 +142,12 @@ def build():
             rows.append({"rank": rank, "organisation": p["name"], "sector": p["sector"], "score": round(sc), "tier": tier(sc),
                          "type": "badge", "date": "", "claim": n, "rule_or_basis": r, "source_id": "", "source_title": "",
                          "source_url": "", "reviewer_ok": "", "reviewer_notes": ""})
+        for cat in ("water", "air", "habitat"):
+            if p.get("points_basis"):
+                rows.append({"rank": rank, "organisation": p["name"], "sector": p["sector"], "score": round(sc), "tier": tier(sc),
+                             "type": f"points reason ({cat})", "date": "", "claim": p["points_basis"][cat],
+                             "rule_or_basis": "reviewed" if p["points_basis"].get("reviewed") else "draft",
+                             "source_id": "", "source_title": "", "source_url": "", "reviewer_ok": "", "reviewer_notes": ""})
         if p.get("note"):
             rows.append({"rank": rank, "organisation": p["name"], "sector": p["sector"], "score": round(sc), "tier": tier(sc),
                          "type": "note", "date": "", "claim": p["note"], "rule_or_basis": "", "source_id": "",

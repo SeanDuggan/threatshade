@@ -341,3 +341,24 @@ class PageLinks(unittest.TestCase):
                 self.assertTrue(common.host_allowed(url.replace("&amp;", "&"), hosts), f"{page.name}: {url}")
             for tag in re.findall(r'<a [^>]*href="https?://[^>]*>', html):
                 self.assertIn('rel="noopener noreferrer"', tag, page.name)
+
+
+class PointsBasis(unittest.TestCase):
+    def test_every_polluter_has_reasons_for_hand_set_points(self):
+        for p in data()["polluters"]:
+            b = p.get("points_basis")
+            self.assertIsInstance(b, dict, p["id"])
+            for k in ("water", "air", "habitat"):
+                self.assertTrue(b.get(k), f"{p['id']}.{k}")
+
+    def test_validator_rejects_bad_reasons(self):
+        for bad in ({"water": "x", "air": "x", "habitat": "x", "reviewed": "yes"},
+                    {"water": "<b>x</b>", "air": "x", "habitat": "x", "reviewed": False},
+                    {"water": "x", "air": "x", "habitat": "x", "reviewed": False, "extra": 1}):
+            d = data()
+            d["polluters"][0]["points_basis"] = bad
+            self.assertTrue(validate.validate(d).errors, bad)
+
+    def test_page_only_shows_reviewed_reasons(self):
+        js = (ROOT / "site/app.js").read_text(encoding="utf-8")
+        self.assertIn("basis.reviewed === true", js)

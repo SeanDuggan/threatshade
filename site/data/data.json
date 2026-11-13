@@ -272,7 +272,13 @@
         }
       ],
       "note": "Coillte says it is committed to redesigning 30,000 ha of peatland forest, and it runs a Forests for Nature programme. At its Derryclare pathfinder project, no conifers had been removed seven years after work began.",
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "15: court case over discharges to water. Pleaded guilty after silt from thinning damaged salmon and sea trout spawning beds on the Glenaboy River (Probation Act applied) [24].",
+        "air": "No air or odour record in our sources.",
+        "habitat": "15: largest owner of drained peatland (232,500 ha) [23], the method's 12 to 15 band for peatland owners, plus forestry's role as a sediment pressure on pearl mussel rivers [26].",
+        "reviewed": false
+      }
     },
     {
       "id": "bnm",
@@ -348,7 +354,13 @@
         }
       ],
       "note": "Bord na Móna scores low because it has stopped extracting peat and is rewetting its bogs. Its climate score is zero only because no current emissions figure for its remaining drained land is published, not because that land is harmless.",
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "No water pollution record in our sources.",
+        "air": "No air or odour record in our sources.",
+        "habitat": "12: large owner of drained peatland (about 80,000 ha of former extraction bogs) [31]. Kept at the bottom of the 12 to 15 band because rewetting is under way [28] [29].",
+        "reviewed": false
+      }
     },
     {
       "id": "uisce",
@@ -447,7 +459,13 @@
       "epa_licences": [
         "D0024-01",
         "D0056-01"
-      ]
+      ],
+      "points_basis": {
+        "water": "25: systemic failures. Daily raw sewage discharges from 11 towns [5], 55% of plants failing standards [6] and 35 successful EPA prosecutions [6].",
+        "air": "No air or odour record in our sources.",
+        "habitat": "15: discharges into protected waters, including Foynes and Glin on the Shannon Estuary [5], and harm to freshwater pearl mussels downstream of overloaded plants [21].",
+        "reviewed": false
+      }
     },
     {
       "id": "northcork",
@@ -505,7 +523,13 @@
       "note": null,
       "epa_licences": [
         "P1051-01"
-      ]
+      ],
+      "points_basis": {
+        "water": "18: a current EPA priority site over emissions to water and its wastewater plant [3]. Also convicted over discharges to the River Allow [34] [16].",
+        "air": "No air or odour record in our sources.",
+        "habitat": "15: discharges to the River Allow, a tributary of the Munster Blackwater [34]. The method names the Blackwater as protected. Needs a source confirming the protected status.",
+        "reviewed": false
+      }
     },
     {
       "id": "aurivo",
@@ -558,7 +582,13 @@
       "note": null,
       "epa_licences": [
         "P0802-03"
-      ]
+      ],
+      "points_basis": {
+        "water": "15: court case over discharges to water. DPP prosecution with EUR 350,000 in fines and penalties [10] and payments for the River Lung [8].",
+        "air": "0. Its past priority listing [10] is not recorded as being about air or odour.",
+        "habitat": "10: judgement for harm to the River Lung [8]. No source yet on whether the river is a protected site.",
+        "reviewed": false
+      }
     },
     {
       "id": "chemifloc",
@@ -599,7 +629,13 @@
         }
       ],
       "note": null,
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "18: a current EPA priority site over groundwater contamination [3].",
+        "air": "No air or odour record in our sources.",
+        "habitat": "8: judgement for groundwater contamination near the Shannon Estuary. The site location is approximate and no source yet confirms which protected area, if any, is affected.",
+        "reviewed": false
+      }
     },
     {
       "id": "aughinish",
@@ -640,7 +676,13 @@
         }
       ],
       "note": "The refinery sits on the Shannon Estuary, which is designated for protection, hence the maximum habitat score.",
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "No water pollution record in our sources.",
+        "air": "No air or odour record in our sources.",
+        "habitat": "15: the refinery is on the Shannon Estuary, which is designated for protection. Needs a source added for the designation (for example the NPWS site record).",
+        "reviewed": false
+      }
     },
     {
       "id": "esb",
@@ -706,7 +748,13 @@
         }
       ],
       "note": null,
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "0. The Derrybrien fish kill [36] is shown as background only and is not scored.",
+        "air": "No air or odour record in our sources.",
+        "habitat": "12: judgement. Moneypoint is on the Shannon Estuary and Poolbeg on Dublin Bay. No source yet for the designations, and the score covers several sites.",
+        "reviewed": false
+      }
     },
     {
       "id": "ryanair",
@@ -752,7 +800,13 @@
         }
       ],
       "note": "Aviation damage is spread out rather than tied to one habitat, so it scores low on habitat and high on climate.",
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "No water pollution record in our sources.",
+        "air": "No air or odour record in our sources.",
+        "habitat": "4: the method's lowest band, for diffuse damage that is not tied to one habitat (aviation).",
+        "reviewed": false
+      }
     },
     {
       "id": "irishcement",
@@ -803,7 +857,13 @@
         }
       ],
       "note": null,
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "No water pollution record in our sources.",
+        "air": "No air or odour record in our sources.",
+        "habitat": "10: judgement, with no supporting source in the data yet. Needs a reason and source (for example proximity of Platin or Limerick Works to protected sites) or a lower score.",
+        "reviewed": false
+      }
     },
     {
       "id": "arrow",
@@ -849,7 +909,13 @@
         }
       ],
       "note": null,
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "No water pollution record in our sources.",
+        "air": "10: a current EPA priority site over odour management [3].",
+        "habitat": "4: judgement for a local odour problem with no water link. The site location is approximate.",
+        "reviewed": false
+      }
     },
     {
       "id": "alert",
@@ -890,7 +956,13 @@
         }
       ],
       "note": null,
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "No water pollution record in our sources.",
+        "air": "10: a current EPA priority site over emissions to air and odour management [3].",
+        "habitat": "4: judgement for a local air problem with no water link. The site location is approximate.",
+        "reviewed": false
+      }
     },
     {
       "id": "tipperary",
@@ -941,7 +1013,13 @@
         }
       ],
       "note": null,
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "10: an earlier EPA priority listing [11], with the EPA calling on milk processors on the list to stop polluting discharges [18]. Needs a source naming the listing reason as water.",
+        "air": "No air or odour record in our sources.",
+        "habitat": "6: judgement. No source yet on the receiving river or its status.",
+        "reviewed": false
+      }
     },
     {
       "id": "galway",
@@ -984,7 +1062,13 @@
       "note": null,
       "epa_licences": [
         "W0013-01"
-      ]
+      ],
+      "points_basis": {
+        "water": "12: court case including contaminated discharges to surface water not reported promptly to Inland Fisheries Ireland [15].",
+        "air": "No air or odour record in our sources.",
+        "habitat": "8: judgement. No source yet on the receiving waters or their status.",
+        "reviewed": false
+      }
     },
     {
       "id": "kingspan",
@@ -1032,7 +1116,13 @@
       "note": null,
       "epa_licences": [
         "P0065-01"
-      ]
+      ],
+      "points_basis": {
+        "water": "No water pollution record in our sources.",
+        "air": "8: an earlier EPA priority listing over air emissions [10] and a conviction including unlicensed emission points [7].",
+        "habitat": "6: judgement. No source yet on nearby protected sites.",
+        "reviewed": false
+      }
     },
     {
       "id": "killarney",
@@ -1080,7 +1170,13 @@
       "note": null,
       "epa_licences": [
         "W0217-01"
-      ]
+      ],
+      "points_basis": {
+        "water": "0. The conviction [10] [9] concerned accepting waste over its licence limit, not discharges to water.",
+        "air": "No air or odour record in our sources.",
+        "habitat": "8: judgement. No source yet on nearby protected sites. The site location is approximate.",
+        "reviewed": false
+      }
     },
     {
       "id": "glenmore",
@@ -1128,7 +1224,13 @@
       "note": null,
       "epa_licences": [
         "P1004-02"
-      ]
+      ],
+      "points_basis": {
+        "water": "No water pollution record in our sources.",
+        "air": "7: conviction over odour from the waste site [13].",
+        "habitat": "12: the site is on the banks of the River Finn [13]. Needs a source confirming the river's protected status.",
+        "reviewed": false
+      }
     },
     {
       "id": "aerlingus",
@@ -1169,7 +1271,13 @@
         }
       ],
       "note": null,
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "No water pollution record in our sources.",
+        "air": "No air or odour record in our sources.",
+        "habitat": "4: the method's lowest band, for diffuse damage that is not tied to one habitat (aviation).",
+        "reviewed": false
+      }
     },
     {
       "id": "kerry",
@@ -1220,7 +1328,13 @@
         }
       ],
       "note": null,
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "No water pollution record in our sources.",
+        "air": "No air or odour record in our sources.",
+        "habitat": "10: judgement, with no supporting source in the data yet. Needs a reason and source for the Listowel and Charleville sites, or a lower score.",
+        "reviewed": false
+      }
     },
     {
       "id": "tirlan",
@@ -1271,7 +1385,13 @@
         }
       ],
       "note": null,
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "12: court case over effluent entering a tributary of the Knappagh River, a brown trout spawning river (pleaded guilty, Probation Act applied) [35].",
+        "air": "No air or odour record in our sources.",
+        "habitat": "8: judgement for harm to trout spawning and nursery habitat in the Erne system [35]. No source yet on protected status.",
+        "reviewed": false
+      }
     },
     {
       "id": "timoleague",
@@ -1312,7 +1432,13 @@
         }
       ],
       "note": null,
-      "epa_licences": []
+      "epa_licences": [],
+      "points_basis": {
+        "water": "0. The reason for its past priority listing [11] is not recorded. If it was about water or odour, the method gives points that are not counted here.",
+        "air": "No air or odour record in our sources.",
+        "habitat": "6: judgement. No source yet on nearby protected sites. The site location is approximate.",
+        "reviewed": false
+      }
     }
   ]
 }

@@ -240,3 +240,8 @@ section.team p{margin:0 0 16px}
 .report-error{font-size:13px;margin:4px 0 0;color:var(--muted)}
 .report-error a{color:var(--red)}
 .corrections-log li{color:var(--muted)}
+.why-points{margin-top:14px;font-size:13px}
+.why-points summary{cursor:pointer;font-weight:700;color:var(--red)}
+.why-points ul{margin:8px 0 0;padding-left:18px}
+.why-points li{margin-bottom:6px}
+.why-note{color:var(--muted);font-size:12px;margin:6px 0 0}

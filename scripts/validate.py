@@ -136,6 +136,15 @@ def validate(data, r: Result | None = None) -> Result:
         for j, lic in enumerate(p.get("epa_licences") or []):
             if not isinstance(lic, str) or not re.match(r"^[A-Z]\d{4}-\d{2}$", lic):
                 r.err(f"{w}.epa_licences[{j}]: expected an EPA register number like P0065-01")
+        basis = p.get("points_basis")
+        if basis is not None:
+            if not isinstance(basis, dict) or set(basis) - {"water", "air", "habitat", "reviewed"}:
+                r.err(f"{w}.points_basis: only water, air, habitat and reviewed are allowed")
+            else:
+                for k in ("water", "air", "habitat"):
+                    _text(r, f"{w}.points_basis.{k}", basis.get(k), 400)
+                if not isinstance(basis.get("reviewed"), bool):
+                    r.err(f"{w}.points_basis.reviewed: must be true or false")
 
     if r.errors:
         return r
