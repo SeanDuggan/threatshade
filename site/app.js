@@ -231,6 +231,21 @@
       try { drawTreeLayer(cfg, checkGrid(grids[i]), keysBox, btnBox); } catch (e) { if (window.console) console.error(e); }
     });
     if (btnBox.firstChild) { legend.insertBefore(keysBox, legend.firstChild); legend.insertBefore(btnBox, legend.firstChild); }
+    updateNativeFact(grids);
+  }
+  function updateNativeFact(grids) {
+    var sitka = grids[0], native = grids[1];
+    var total = document.getElementById("native-total"), text = document.getElementById("native-fact"), link = document.getElementById("native-fact-link");
+    if (!native || !num(native.total_ha, 1, 5000000) || !total) return;
+    total.textContent = ha(native.total_ha);
+    if (text && sitka && num(sitka.total_ha, 1, 5000000)) text.textContent = "of native trees in Irish state and private forests, against " + ha(sitka.total_ha) + " of Sitka spruce";
+    if (link) link.addEventListener("click", function (e) {
+      var btn = document.querySelector(".tree-toggle.native");
+      if (!btn) return;
+      e.preventDefault();
+      if (btn.getAttribute("aria-pressed") !== "true") btn.click();
+      document.getElementById("map").scrollIntoView({ behavior: smooth(), block: "start" });
+    });
   }
   function inCounty(p) { return !countyFilter || p.counties.indexOf(countyFilter) >= 0; }
   function visible(p) { return (sectorFilter === "All" || p.sector === sectorFilter) && inCounty(p); }
