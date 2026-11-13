@@ -9,7 +9,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
-from common import (DATA_PATH, MAP_PATH, REPORT_PATH, RING_RE, ROOT, SITKA_PATH, allowlist, area_at,
+from common import (DATA_PATH, MAP_PATH, REPORT_PATH, RING_RE, ROOT, NATIVE_PATH, SITKA_PATH, allowlist, area_at,
                     decode_ring, host_allowed, load_json, score)
 
 SECTORS = {"Water utility", "Dairy & food", "Chemicals", "Heavy industry", "Power", "Aviation",
@@ -200,62 +200,62 @@ SITKA_MAX_BYTES = 200_000
 SITKA_CELL_MAX_HA = 3000
 
 
-def validate_sitka(g, r: Result | None = None) -> Result:
+def validate_tree_grid(g, r: Result | None = None, label: str = "sitka") -> Result:
     r = r or Result()
     if not isinstance(g, dict):
-        r.err("sitka: top level must be an object")
+        r.err(f"{label}: top level must be an object")
         return r
     allowed = {"version", "species", "method", "sources", "fetched", "origin", "cell", "plots",
                "coillte_ha", "private_ha", "total_ha", "cells"}
     if set(g) - allowed:
-        r.err(f"sitka: unexpected keys {sorted(set(g) - allowed)}")
+        r.err(f"{label}: unexpected keys {sorted(set(g) - allowed)}")
     if g.get("version") != 2:
-        r.err("sitka.version must be 2")
-    _text(r, "sitka.species", g.get("species"), 40)
-    _text(r, "sitka.method", g.get("method"), 120)
+        r.err(f"{label}.version must be 2")
+    _text(r, f"{label}.species", g.get("species"), 40)
+    _text(r, f"{label}.method", g.get("method"), 250)
     srcs = g.get("sources")
     if not isinstance(srcs, list) or not (1 <= len(srcs) <= 5):
-        r.err("sitka.sources: between 1 and 5 sources required")
+        r.err(f"{label}.sources: between 1 and 5 sources required")
         srcs = []
     for k, s in enumerate(srcs):
         if not isinstance(s, dict) or set(s) - {"name", "licence", "url"}:
-            r.err(f"sitka.sources[{k}]: must have only name, licence and url")
+            r.err(f"{label}.sources[{k}]: must have only name, licence and url")
             continue
-        _text(r, f"sitka.sources[{k}].name", s.get("name"), 80)
-        _text(r, f"sitka.sources[{k}].licence", s.get("licence"), 30)
+        _text(r, f"{label}.sources[{k}].name", s.get("name"), 80)
+        _text(r, f"{label}.sources[{k}].licence", s.get("licence"), 30)
         if not isinstance(s.get("url"), str) or not host_allowed(s["url"], allowlist()["link_hosts"]):
-            r.err(f"sitka.sources[{k}].url: must be https on an allowlisted host")
-    _num(r, "sitka.coillte_ha", g.get("coillte_ha"), 0, 1_000_000, integer=True)
-    _num(r, "sitka.private_ha", g.get("private_ha"), 0, 1_000_000, integer=True)
+            r.err(f"{label}.sources[{k}].url: must be https on an allowlisted host")
+    _num(r, f"{label}.coillte_ha", g.get("coillte_ha"), 0, 1_000_000, integer=True)
+    _num(r, f"{label}.private_ha", g.get("private_ha"), 0, 1_000_000, integer=True)
     try:
         dt.date.fromisoformat(str(g.get("fetched")))
     except ValueError:
-        r.err("sitka.fetched must be an ISO date")
+        r.err(f"{label}.fetched must be an ISO date")
     o, c = g.get("origin") or {}, g.get("cell") or {}
-    _num(r, "sitka.origin.lat", o.get("lat"), 51, 52)
-    _num(r, "sitka.origin.lng", o.get("lng"), -11, -10)
-    _num(r, "sitka.cell.dlat", c.get("dlat"), 0.01, 0.2)
-    _num(r, "sitka.cell.dlng", c.get("dlng"), 0.01, 0.3)
-    _num(r, "sitka.plots", g.get("plots"), 0, 500_000, integer=True)
+    _num(r, f"{label}.origin.lat", o.get("lat"), 51, 52)
+    _num(r, f"{label}.origin.lng", o.get("lng"), -11, -10)
+    _num(r, f"{label}.cell.dlat", c.get("dlat"), 0.01, 0.2)
+    _num(r, f"{label}.cell.dlng", c.get("dlng"), 0.01, 0.3)
+    _num(r, f"{label}.plots", g.get("plots"), 0, 500_000, integer=True)
     cells = g.get("cells")
     if not isinstance(cells, list) or not (1 <= len(cells) <= 8000):
-        r.err("sitka.cells: between 1 and 8000 cells required")
+        r.err(f"{label}.cells: between 1 and 8000 cells required")
         return r
     seen, total = set(), 0
     for k, cell in enumerate(cells):
         ok = (isinstance(cell, list) and len(cell) == 3 and all(isinstance(v, int) and not isinstance(v, bool) for v in cell)
               and 0 <= cell[0] <= 80 and 0 <= cell[1] <= 90 and 1 <= cell[2] <= SITKA_CELL_MAX_HA)
         if not ok:
-            r.err(f"sitka.cells[{k}]: must be [column 0-80, row 0-90, hectares 1-{SITKA_CELL_MAX_HA}]")
+            r.err(f"{label}.cells[{k}]: must be [column 0-80, row 0-90, hectares 1-{SITKA_CELL_MAX_HA}]")
             continue
         if (cell[0], cell[1]) in seen:
-            r.err(f"sitka.cells[{k}]: duplicate cell")
+            r.err(f"{label}.cells[{k}]: duplicate cell")
         seen.add((cell[0], cell[1]))
         total += cell[2]
     if not r.errors and g.get("total_ha") != total:
-        r.err("sitka.total_ha does not match the sum of the cells")
+        r.err(f"{label}.total_ha does not match the sum of the cells")
     if not r.errors and abs(g["coillte_ha"] + g["private_ha"] - total) > max(50, 0.01 * total):
-        r.err("sitka.coillte_ha + private_ha does not match total_ha")
+        r.err(f"{label}.coillte_ha + private_ha does not match total_ha")
     return r
 
 
@@ -326,12 +326,13 @@ def main(argv=None) -> int:
         validate_map(m, r)
         if not r.errors:
             check_sites_on_land(data, m, r)
-    if not SITKA_PATH.exists():
-        r.err("sitka grid file missing (run scripts/build_sitka.py)")
-    elif len(SITKA_PATH.read_bytes()) > SITKA_MAX_BYTES:
-        r.err("sitka grid file too large")
-    else:
-        validate_sitka(load_json(SITKA_PATH), r)
+    for label, path in (("sitka", SITKA_PATH), ("native", NATIVE_PATH)):
+        if not path.exists():
+            r.err(f"{label} grid file missing (run scripts/build_tree_layers.py)")
+        elif len(path.read_bytes()) > SITKA_MAX_BYTES:
+            r.err(f"{label} grid file too large")
+        else:
+            validate_tree_grid(load_json(path), r, label)
     base = None if r.errors else load_baseline(args)
     if base is not None:
         compare(base, data, r)

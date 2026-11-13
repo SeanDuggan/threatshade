@@ -10,12 +10,12 @@ There is no server, database, login or form: just HTML, CSS, JavaScript and JSON
 site/                  Everything that is deployed (Cloudflare Pages output directory)
   index.html, 404.html, privacy.html
   app.js, styles.css   Scoring, map and scoreboard; data is rendered with DOM APIs only
-  data/                data.json (polluters, evidence, sources), ireland-map.json, sitka-grid.json
+  data/                data.json (polluters, evidence, sources), ireland-map.json, sitka-grid.json, native-grid.json
   assets/              Logo, team avatars, self-hosted fonts (OFL)
   _headers             Security headers (CSP, HSTS and others)
   .well-known/security.txt, security-policy.txt
   favicon.*, icon-*.png, site.webmanifest
-scripts/               Python, standard library only: fetch_updates, validate, build_map, build_sitka
+scripts/               Python, standard library only: fetch_updates, validate, build_map, build_tree_layers
 config/                link_allowlist.json: hosts that links and fetchers may use
 data/state/            What the weekly fetcher saw last time
 tests/                 python3 -m unittest discover -s tests
@@ -37,7 +37,7 @@ Then open http://localhost:8000 (`fetch()` does not work from `file://`). Python
 - **Scoreboard:** edit `site/data/data.json` by hand, update `last_reviewed`, run the tests and validator, and open a pull request. Every claim needs a source on an allowlisted host.
 - **Weekly update:** every Monday a workflow checks the EPA priority sites list, prosecutions pages and LEAP API. It only changes priority-list status by itself, and only on an exact name match; everything else goes into a report. If anything changed it opens a pull request for review.
 - **County map:** from MapSVG's Ireland map (CC0), converted to integer outlines by `build_map.py`; no SVG markup reaches the page. To refresh: download `https://mapsvg.com/maps/geo-calibrated/ireland.svg` and run `python3 scripts/build_map.py ireland.svg`.
-- **Sitka spruce overlay** (off by default): hectares of Sitka per ~5 km square, from the Coillte Forest Inventory and the DAFM Private Forest Estate 2023 (both CC BY 4.0). Each plot counts its area times Sitka's share, stocked forest only. Only 5 km totals are published, never plot shapes or owners. To refresh, download the DAFM zip from [data.gov.ie](https://data.gov.ie/dataset/dafm-private-forest-estate-2023) (its server blocks scripts) and run `python3 scripts/build_sitka.py --private path/to/privateforests2023.zip`.
+- **Tree layers** (both off by default): hectares of Sitka spruce, and of native species (oak, birch, alder, ash, hazel, holly, yew, rowan, willow, elm, hawthorn), per ~5 km square, from the Coillte Forest Inventory and the DAFM Private Forest Estate 2023 (both CC BY 4.0). Each plot counts its area times that species' share, stocked forest only. Scots pine and broadleaf mixes with unrecorded species are left out of the native layer. Only 5 km totals are published, never plot shapes or owners. To refresh both, download the DAFM zip from [data.gov.ie](https://data.gov.ie/dataset/dafm-private-forest-estate-2023) (its server blocks scripts) and run `python3 scripts/build_tree_layers.py --private path/to/privateforests2023.zip`.
 
 ## Security
 

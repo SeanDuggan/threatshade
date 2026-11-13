@@ -13,16 +13,20 @@
     "europa.eu",
     "bnm.ie",
     "leinsterexpress.ie",
-    "data.gov.ie",
+    "data.gov.ie"
+  ],
+  "fetch_hosts": [
+    "www.epa.ie",
+    "data.epa.ie"
+  ],
+  "page_link_hosts": [
     "ucc.ie",
     "mapsvg.com",
     "cloudflare.com",
     "dataprotection.ie",
     "github.com"
   ],
-  "fetch_hosts": [
-    "www.epa.ie",
-    "data.epa.ie",
+  "layer_fetch_hosts": [
     "services7.arcgis.com"
   ]
 }

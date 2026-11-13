@@ -12,17 +12,26 @@ import urllib.parse
 import zipfile
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
-from common import SITKA_PATH, write_json
+from common import NATIVE_PATH, SITKA_PATH, allowlist, write_json
 import fetch_updates
 
 LAYER = "https://services7.arcgis.com/6LSAdqgf43oKRpP6/arcgis/rest/services/Coillte_Boundaries_Consultation/FeatureServer/4"
 STOCKED = ("CHF", "MHF", "BHF")
-WHERE = "(SPP1='SS' OR SPP2='SS' OR SPP3='SS' OR SPP4='SS') AND LUT IN ('CHF','MHF','BHF')"
+WHERE = "LUT IN ('CHF','MHF','BHF')"
 PAGE = 1000
 ORIGIN = {"lat": 51.3, "lng": -10.7}
 CELL = {"dlat": 0.05, "dlng": 0.075}
 MAX_I, MAX_J = 80, 90
-MIN_PLOTS, MAX_PLOTS = 20_000, 300_000
+MIN_PLOTS, MAX_PLOTS = 20_000, 400_000
+NATIVE = {"OAK", "PO", "SO", "BI", "DBI", "SBI", "ALD", "ASH", "HAZ", "HOL", "YEW", "ROW", "RWN",
+          "SAL", "WIL", "EWIL", "ELM", "HAW"}
+LAYERS = {
+    "sitka": {"species": "Sitka spruce", "codes": {"SS"}, "path": SITKA_PATH,
+              "method": "Plot area x Sitka spruce share of the plot, stocked forest only"},
+    "native": {"species": "Native Irish trees", "codes": NATIVE, "path": NATIVE_PATH,
+               "method": "Plot area x share of native species (oak, birch, alder, ash, hazel, holly, yew, rowan, "
+                         "willow, elm, hawthorn), stocked forest only; Scots pine and unspecified mixes excluded"},
+}
 SOURCES = [
     {"name": "Coillte Forest Inventory", "licence": "CC BY 4.0",
      "url": "https://data.gov.ie/en_GB/dataset/coilltepublicboundaries"},
@@ -63,12 +72,14 @@ def itm_to_latlng(e: float, n: float) -> tuple[float, float]:
     return math.degrees(lat), math.degrees(lng)
 
 
-def sitka_share(pairs) -> float:
-    return sum(p for s, p in pairs if s == "SS") / 100.0
+def share(pairs, codes) -> float:
+    return min(sum(p for s, p in pairs if s in codes) / 100.0, 1.0)
 
 
 def query(params: dict, attempts: int = 4) -> dict:
     url = LAYER + "/query?" + urllib.parse.urlencode({**params, "f": "json"})
+    if not url.startswith(LAYER + "/query?"):
+        raise ValueError("unexpected query URL")
     for attempt in range(1, attempts + 1):
         try:
             d = json.loads(fetch_updates.fetch(url, "application/json"))
@@ -84,12 +95,20 @@ def query(params: dict, attempts: int = 4) -> dict:
     raise RuntimeError("unreachable")
 
 
-def fetch_coillte() -> list[tuple[float, float, float]]:
+def _split(plot_pairs, lat, lng, area, out):
+    for key, layer in LAYERS.items():
+        sh = share(plot_pairs, layer["codes"])
+        if sh > 0:
+            out[key].append((lat, lng, area * sh))
+
+
+def fetch_coillte() -> dict[str, list]:
     total = query({"where": WHERE, "returnCountOnly": "true"})["count"]
     if not (MIN_PLOTS <= total <= MAX_PLOTS):
         raise ValueError(f"{total} Coillte plots is outside the expected range")
     fields = "GIS_AREA,FID," + ",".join(f"SPP{i},CANOPY{i}" for i in range(1, 5))
-    plots, offset = [], 0
+    out = {k: [] for k in LAYERS}
+    offset = 0
     while offset < total:
         d = query({"where": WHERE, "outFields": fields, "returnGeometry": "false",
                    "returnCentroid": "true", "outSR": "4326", "orderByFields": "FID",
@@ -105,16 +124,14 @@ def fetch_coillte() -> list[tuple[float, float, float]]:
                 continue
             if not all(isinstance(p, (int, float)) and 0 <= p <= 100 for _, p in pairs):
                 continue
-            share = sitka_share(pairs)
-            if share == 0 and pairs[0][0] == "SS" and sum(p for _, p in pairs) == 0:
-                share = 1.0
-            if share > 0:
-                plots.append((lat, lng, area * min(share, 1.0)))
+            if sum(p for _, p in pairs) == 0 and pairs[0][0]:
+                pairs = [(pairs[0][0], 100)]
+            _split(pairs, lat, lng, area, out)
         offset += len(feats)
         print(f"  Coillte {offset} / {total}", file=sys.stderr)
     if offset < 0.98 * total:
         raise ValueError(f"only fetched {offset} of {total} Coillte plots")
-    return plots
+    return out
 
 
 def _dbf_rows(data: bytes):
@@ -153,7 +170,7 @@ def _shp_boxes(data: bytes):
         pos += 8 + length
 
 
-def read_private(zip_path: str) -> list[tuple[float, float, float]]:
+def read_private(zip_path: str) -> dict[str, list]:
     with zipfile.ZipFile(zip_path) as z:
         names = {i.filename for i in z.infolist()}
         need = {PRIVATE_STEM + ".shp", PRIVATE_STEM + ".dbf"}
@@ -163,7 +180,7 @@ def read_private(zip_path: str) -> list[tuple[float, float, float]]:
             if z.getinfo(nm).file_size > 400_000_000:
                 raise ValueError(f"{nm} is unexpectedly large")
         shp, dbf = z.read(PRIVATE_STEM + ".shp"), z.read(PRIVATE_STEM + ".dbf")
-    plots = []
+    out = {k: [] for k in LAYERS}
     for box, row in zip(_shp_boxes(shp), _dbf_rows(dbf)):
         if box is None or row is None or row.get("LUC") not in STOCKED:
             continue
@@ -172,20 +189,19 @@ def read_private(zip_path: str) -> list[tuple[float, float, float]]:
             pairs = [(row.get(f"Sp_{i}", ""), float(row.get(f"SpPerc_{i}") or 0)) for i in range(1, 8)]
         except ValueError:
             continue
-        share = sitka_share(pairs)
-        if not (0 < area < 1000 and 0 < share <= 1.0001):
+        if not (0 < area < 1000) or any(not 0 <= p <= 100 for _, p in pairs):
             continue
         xmin, ymin, xmax, ymax = box
         if not (400_000 <= xmin <= xmax <= 800_000 and 500_000 <= ymin <= ymax <= 1_000_000):
             continue
         lat, lng = itm_to_latlng((xmin + xmax) / 2, (ymin + ymax) / 2)
-        plots.append((lat, lng, area * min(share, 1.0)))
-    if not (MIN_PLOTS <= len(plots) <= MAX_PLOTS):
-        raise ValueError(f"{len(plots)} private Sitka plots is outside the expected range")
-    return plots
+        _split(pairs, lat, lng, area, out)
+    if not (MIN_PLOTS <= len(out["sitka"]) <= MAX_PLOTS):
+        raise ValueError(f"{len(out['sitka'])} private Sitka plots is outside the expected range")
+    return out
 
 
-def grid(coillte, private) -> dict:
+def grid(coillte, private, layer: str = "sitka") -> dict:
     cells: dict[tuple[int, int], float] = {}
     totals = {}
     for key, plots in (("coillte", coillte), ("private", private)):
@@ -200,8 +216,8 @@ def grid(coillte, private) -> dict:
     rows = sorted([i, j, round(ha)] for (i, j), ha in cells.items() if round(ha) >= 1)
     return {
         "version": 2,
-        "species": "Sitka spruce",
-        "method": "Plot area x Sitka spruce share of the plot, stocked forest only",
+        "species": LAYERS[layer]["species"],
+        "method": LAYERS[layer]["method"],
         "sources": SOURCES,
         "fetched": dt.date.today().isoformat(),
         "origin": ORIGIN,
@@ -218,12 +234,16 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--private", required=True, help="path to privateforests2023.zip from data.gov.ie")
     args = ap.parse_args(argv)
+    fetch_updates.FETCH_HOSTS = allowlist()["layer_fetch_hosts"]
     private = read_private(args.private)
-    print(f"private: {len(private)} plots, {round(sum(p[2] for p in private))} ha of Sitka", file=sys.stderr)
-    out = grid(fetch_coillte(), private)
-    write_json(SITKA_PATH, out)
-    print(f"{out['plots']} plots, {out['total_ha']} ha in {len(out['cells'])} cells "
-          f"(Coillte {out['coillte_ha']}, private {out['private_ha']}) -> {SITKA_PATH}")
+    for key in LAYERS:
+        print(f"private {key}: {len(private[key])} plots, {round(sum(p[2] for p in private[key]))} ha", file=sys.stderr)
+    coillte = fetch_coillte()
+    for key, layer in LAYERS.items():
+        out = grid(coillte[key], private[key], key)
+        write_json(layer["path"], out)
+        print(f"{key}: {out['plots']} plots, {out['total_ha']} ha in {len(out['cells'])} cells "
+              f"(Coillte {out['coillte_ha']}, private {out['private_ha']}) -> {layer['path']}")
     return 0
 
 

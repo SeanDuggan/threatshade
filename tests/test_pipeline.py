@@ -223,7 +223,7 @@ class CountyMap(unittest.TestCase):
             build_map.parse_path("M 0,0 C 1,1 2,2 3,3 Z")
 
 
-import build_sitka
+import build_tree_layers as build_sitka
 
 
 class SitkaGrid(unittest.TestCase):
@@ -235,29 +235,32 @@ class SitkaGrid(unittest.TestCase):
         self.assertEqual(len(g["cells"]), 2)
         self.assertEqual(g["total_ha"], 16 + 2)
         self.assertEqual((g["coillte_ha"], g["private_ha"]), (16, 2))
-        self.assertEqual(validate.validate_sitka(g).errors, [])
+        self.assertEqual(validate.validate_tree_grid(g).errors, [])
 
     def test_validator_rejects_bad_cells(self):
         for bad in ([1, 2], [1, 2, 0], [1, 2, 99999], [-1, 2, 5], [1, 2, "5"], [1, 2, True]):
             g = self.sample()
             g["cells"].append(bad)
-            self.assertTrue(validate.validate_sitka(g).errors, bad)
+            self.assertTrue(validate.validate_tree_grid(g).errors, bad)
 
     def test_validator_rejects_wrong_totals_unknown_keys_and_bad_sources(self):
         g = self.sample(); g["total_ha"] += 1
-        self.assertTrue(validate.validate_sitka(g).errors)
+        self.assertTrue(validate.validate_tree_grid(g).errors)
         g = self.sample(); g["private_ha"] += 500
-        self.assertTrue(validate.validate_sitka(g).errors)
+        self.assertTrue(validate.validate_tree_grid(g).errors)
         g = self.sample(); g["script"] = "x"
-        self.assertTrue(validate.validate_sitka(g).errors)
+        self.assertTrue(validate.validate_tree_grid(g).errors)
         g = self.sample(); g["sources"][0]["url"] = "https://evil.example/"
-        self.assertTrue(validate.validate_sitka(g).errors)
+        self.assertTrue(validate.validate_tree_grid(g).errors)
 
     def test_published_grid_is_valid(self):
         g = common.load_json(common.SITKA_PATH)
-        self.assertEqual(validate.validate_sitka(g).errors, [])
+        self.assertEqual(validate.validate_tree_grid(g).errors, [])
         self.assertGreater(g["coillte_ha"], 100_000)
         self.assertGreater(g["private_ha"], 100_000)
+        n = common.load_json(common.NATIVE_PATH)
+        self.assertEqual(validate.validate_tree_grid(n, label="native").errors, [])
+        self.assertEqual(n["species"], "Native Irish trees")
 
     def test_itm_conversion_matches_known_point(self):
         lat, lng = build_sitka.itm_to_latlng(715830, 734697)
@@ -265,8 +268,11 @@ class SitkaGrid(unittest.TestCase):
         self.assertAlmostEqual(lng, -6.2603, places=3)
 
     def test_only_the_sitka_share_counts(self):
-        self.assertAlmostEqual(build_sitka.sitka_share([("SS", 60), ("NS", 40)]), 0.6)
-        self.assertEqual(build_sitka.sitka_share([("BMO", 100)]), 0)
+        self.assertAlmostEqual(build_sitka.share([("SS", 60), ("NS", 40)], {"SS"}), 0.6)
+        self.assertEqual(build_sitka.share([("BMO", 100)], {"SS"}), 0)
+        native = build_sitka.LAYERS["native"]["codes"]
+        self.assertAlmostEqual(build_sitka.share([("OAK", 50), ("BI", 20), ("SP", 30)], native), 0.7)
+        self.assertEqual(build_sitka.share([("SP", 100), ("BMO", 0), ("BE", 0)], native), 0)
 
     def test_reads_private_shapefile_from_zip(self):
         import io, struct, tempfile, zipfile
@@ -293,7 +299,7 @@ class SitkaGrid(unittest.TestCase):
 
         rows = [{"Sp_1": "SS", "SpPerc_1": 60, "Sp_2": "NS", "SpPerc_2": 40, "LUC": "CHF", "Area_ha": 10},
                 {"Sp_1": "SS", "SpPerc_1": 100, "LUC": "Road", "Area_ha": 5},
-                {"Sp_1": "BMO", "SpPerc_1": 100, "LUC": "BHF", "Area_ha": 7}]
+                {"Sp_1": "ASH", "SpPerc_1": 100, "LUC": "BHF", "Area_ha": 7}]
         boxes = [(715800, 734600, 715900, 734800)] * 3
         tmp = tempfile.NamedTemporaryFile(suffix=".zip", delete=False); tmp.close()
         with zipfile.ZipFile(tmp.name, "w") as z:
@@ -302,22 +308,32 @@ class SitkaGrid(unittest.TestCase):
         old = build_sitka.MIN_PLOTS
         try:
             build_sitka.MIN_PLOTS = 1
-            plots = build_sitka.read_private(tmp.name)
+            layers = build_sitka.read_private(tmp.name)
         finally:
             build_sitka.MIN_PLOTS = old
             Path(tmp.name).unlink()
-        self.assertEqual(len(plots), 1)
-        lat, lng, ha = plots[0]
+        self.assertEqual(len(layers["sitka"]), 1)
+        lat, lng, ha = layers["sitka"][0]
         self.assertAlmostEqual(ha, 6.0)
+        self.assertEqual([round(p[2], 3) for p in layers["native"]], [7.0])
         self.assertAlmostEqual(lat, 53.35, places=2)
 
     def test_build_only_contacts_allowlisted_host(self):
-        self.assertTrue(common.host_allowed(build_sitka.LAYER, common.allowlist()["fetch_hosts"]))
+        self.assertTrue(common.host_allowed(build_sitka.LAYER, common.allowlist()["layer_fetch_hosts"]))
+        self.assertFalse(common.host_allowed(build_sitka.LAYER, common.allowlist()["fetch_hosts"]))
+
+    def test_page_only_hosts_are_not_allowed_as_sources(self):
+        cfg = common.allowlist()
+        self.assertFalse(set(cfg["page_link_hosts"]) & set(cfg["link_hosts"]))
+        d = data()
+        d["sources"][0]["url"] = "https://gist.github.com/someone/abc"
+        self.assertTrue(validate.validate(d).errors)
 
 
 class PageLinks(unittest.TestCase):
     def test_external_links_in_pages_are_https_and_allowlisted(self):
-        hosts = common.allowlist()["link_hosts"]
+        cfg = common.allowlist()
+        hosts = cfg["link_hosts"] + cfg["page_link_hosts"]
         for page in sorted((ROOT / "site").rglob("*.html")):
             html = page.read_text(encoding="utf-8")
             for url in re.findall(r'href="(https?://[^"]+)"', html):
