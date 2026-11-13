@@ -163,16 +163,18 @@
     });
     legend.appendChild(h("span", { "class": "legend-note", text: "County shading = worst score in that county. Click a county to filter." }));
   }
-  var NATIVE_LIST = "oak, birch, alder, ash, hazel, holly, yew, rowan, willow, elm and hawthorn";
+  var NATIVE_LIST = "oak, birch, alder, ash, Scots pine, hazel, holly, yew, rowan, willow, elm and hawthorn";
   var TREE_LAYERS = [
     { key: "sitka", url: "data/sitka-grid.json", show: "Show Sitka spruce plantations", hide: "Hide Sitka spruce plantations",
-      steps: [50, 200, 500, 1000], labels: ["under 50", "50–199", "200–499", "500–999", "1,000+"], about: "sitka-about",
+      about: "sitka-about",
       intro: "Hectares of Sitka spruce in state (Coillte) and private forests, added up in squares of about 5 km. Mixed plots count only their Sitka share." },
     { key: "native", url: "data/native-grid.json", show: "Show native trees", hide: "Hide native trees",
-      steps: [5, 20, 50, 100], labels: ["under 5", "5–19", "20–49", "50–99", "100+"], about: null,
-      intro: "Hectares of native Irish tree species (" + NATIVE_LIST + ") in state (Coillte) and private forests, added up in squares of about 5 km. This counts native trees, many of them planted in recent decades, not old native woodland. Scots pine, and broadleaf mixes whose species are not recorded, are left out, so it is an undercount." }
+      about: null,
+      intro: "Hectares of native Irish tree species (" + NATIVE_LIST + ") in state (Coillte) and private forests, added up in squares of about 5 km. This counts native trees, many of them planted in recent decades, not old native woodland. Broadleaf mixes whose species are not recorded are left out, so it is an undercount." }
   ];
-  var treeGroups = {};
+  var TREE_STEPS = [10, 50, 200, 500];
+  var TREE_LABELS = ["under 10", "10–49", "50–199", "200–499", "500+"];
+  var treeGroups = {}, treeSetters = {};
   function checkGrid(g) {
     if (!g || !Array.isArray(g.cells) || g.cells.length > 8000 || !g.origin || !g.cell) throw new Error("bad tree grid");
     if (!num(g.origin.lat, 51, 52) || !num(g.origin.lng, -11, -10) || !num(g.cell.dlat, 0.01, 0.2) || !num(g.cell.dlng, 0.01, 0.3)) throw new Error("bad tree grid");
@@ -185,12 +187,12 @@
     g.cells.forEach(function (c) {
       var lng0 = g.origin.lng + c[0] * g.cell.dlng, lat0 = g.origin.lat + c[1] * g.cell.dlat;
       var a = proj(lng0, lat0 + g.cell.dlat), b = proj(lng0 + g.cell.dlng, lat0);
-      var step = cfg.steps.filter(function (t) { return c[2] >= t; }).length + 1;
+      var step = TREE_STEPS.filter(function (t) { return c[2] >= t; }).length + 1;
       s("rect", { x: a[0].toFixed(1), y: a[1].toFixed(1), width: (b[0] - a[0]).toFixed(1), height: (b[1] - a[1]).toFixed(1), "class": "s" + step }, group);
     });
     var keyEl = h("div", { "class": "tree-key " + cfg.key, hidden: "hidden" });
-    var swatches = h("span", { "class": "tree-swatches" }, [h("b", { text: g.species + ":" }), " hectares per square"]);
-    cfg.labels.forEach(function (label, i) {
+    var swatches = h("span", { "class": "tree-swatches" }, [h("b", { text: g.species + ":" }), " hectares per square (same scale on both layers, so switch between them to compare)"]);
+    TREE_LABELS.forEach(function (label, i) {
       swatches.appendChild(h("span", null, [h("i", { "class": "sw s" + (i + 1) }), label]));
     });
     keyEl.appendChild(swatches);
@@ -203,8 +205,7 @@
     credit.appendChild(document.createTextNode(". Updated " + g.fetched + "."));
     keyEl.appendChild(credit);
     var btn = h("button", { type: "button", "class": "chip tree-toggle " + cfg.key, "aria-pressed": "false", text: cfg.show });
-    btn.addEventListener("click", function () {
-      var on = btn.getAttribute("aria-pressed") !== "true";
+    function setOn(on) {
       btn.setAttribute("aria-pressed", String(on));
       btn.textContent = on ? cfg.hide : cfg.show;
       group.setAttribute("class", "tree-layer " + cfg.key + (on ? " on" : ""));
@@ -212,6 +213,12 @@
         if (!el) return;
         if (on) el.removeAttribute("hidden"); else el.setAttribute("hidden", "hidden");
       });
+    }
+    treeSetters[cfg.key] = setOn;
+    btn.addEventListener("click", function () {
+      var on = btn.getAttribute("aria-pressed") !== "true";
+      if (on) Object.keys(treeSetters).forEach(function (k) { if (k !== cfg.key) treeSetters[k](false); });
+      setOn(on);
     });
     keysBox.appendChild(keyEl);
     btnBox.appendChild(btn);
@@ -371,6 +378,11 @@
     }));
     var right = h("div", null, [ev, h("div", { "class": "sites" }, [h("b", { text: "Mapped sites: " }), p.sites.map(function (x) { return x.name; }).join(" · ")])]);
     if (p.note) right.appendChild(h("div", { "class": "note", text: p.note }));
+    right.appendChild(h("p", { "class": "report-error" }, [
+      h("a", { href: "mailto:info@threatshade.com?subject=" + encodeURIComponent("Correction: " + p.name), text: "Report an error in this entry" }),
+      " · ",
+      h("a", { href: "/corrections", text: "How corrections and replies work" })
+    ]));
     box.appendChild(right);
   }
   function renderSources() {

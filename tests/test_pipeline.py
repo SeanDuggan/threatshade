@@ -271,8 +271,9 @@ class SitkaGrid(unittest.TestCase):
         self.assertAlmostEqual(build_sitka.share([("SS", 60), ("NS", 40)], {"SS"}), 0.6)
         self.assertEqual(build_sitka.share([("BMO", 100)], {"SS"}), 0)
         native = build_sitka.LAYERS["native"]["codes"]
-        self.assertAlmostEqual(build_sitka.share([("OAK", 50), ("BI", 20), ("SP", 30)], native), 0.7)
-        self.assertEqual(build_sitka.share([("SP", 100), ("BMO", 0), ("BE", 0)], native), 0)
+        self.assertAlmostEqual(build_sitka.share([("OAK", 50), ("BI", 20), ("SS", 30)], native), 0.7)
+        self.assertAlmostEqual(build_sitka.share([("SP", 60), ("LPS", 40)], native), 0.6)
+        self.assertEqual(build_sitka.share([("BMO", 60), ("BE", 40)], native), 0)
 
     def test_reads_private_shapefile_from_zip(self):
         import io, struct, tempfile, zipfile

@@ -237,3 +237,6 @@ section.team p{margin:0 0 16px}
 .team-list a{display:flex;align-items:center;gap:12px;color:var(--text);text-decoration:none;font-weight:600;min-height:44px}
 .team-list a:hover span,.team-list a:focus-visible span{text-decoration:underline;color:var(--red)}
 .team-list img{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--soft);border:2px solid var(--line)}
+.report-error{font-size:13px;margin:4px 0 0;color:var(--muted)}
+.report-error a{color:var(--red)}
+.corrections-log li{color:var(--muted)}

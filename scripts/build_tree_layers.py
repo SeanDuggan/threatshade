@@ -24,13 +24,13 @@ CELL = {"dlat": 0.05, "dlng": 0.075}
 MAX_I, MAX_J = 80, 90
 MIN_PLOTS, MAX_PLOTS = 20_000, 400_000
 NATIVE = {"OAK", "PO", "SO", "BI", "DBI", "SBI", "ALD", "ASH", "HAZ", "HOL", "YEW", "ROW", "RWN",
-          "SAL", "WIL", "EWIL", "ELM", "HAW"}
+          "SAL", "WIL", "EWIL", "ELM", "HAW", "SP"}
 LAYERS = {
     "sitka": {"species": "Sitka spruce", "codes": {"SS"}, "path": SITKA_PATH,
               "method": "Plot area x Sitka spruce share of the plot, stocked forest only"},
     "native": {"species": "Native Irish trees", "codes": NATIVE, "path": NATIVE_PATH,
-               "method": "Plot area x share of native species (oak, birch, alder, ash, hazel, holly, yew, rowan, "
-                         "willow, elm, hawthorn), stocked forest only; Scots pine and unspecified mixes excluded"},
+               "method": "Plot area x share of native species (oak, birch, alder, ash, Scots pine, hazel, holly, yew, "
+                         "rowan, willow, elm, hawthorn), stocked forest only; unspecified mixes excluded"},
 }
 SOURCES = [
     {"name": "Coillte Forest Inventory", "licence": "CC BY 4.0",

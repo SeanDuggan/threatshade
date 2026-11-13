@@ -2,7 +2,7 @@
 
 A static web app that ranks Ireland's worst polluters on a map and a scoreboard, using public records: EU ETS carbon figures, the EPA's National Priority Sites list, EPA and DPP prosecutions, wastewater reports and habitat sensitivity. Every score links to its sources.
 
-There is no server, database, login or form: just HTML, CSS, JavaScript and JSON, served by Cloudflare Pages. QA: https://threatshadeqa.pages.dev (qa.threatshade.com to follow).
+There is no server, database, login or form: just HTML, CSS, JavaScript and JSON, served by Cloudflare Pages. QA: https://threatshadeqa.pages.dev.
 
 ## Layout
 
@@ -57,7 +57,7 @@ Corrections and replies from listed organisations go to info@threatshade.com and
 
 ## Before going public
 
-- Legal review of every claim, badge and the method wording; keep QA behind Cloudflare Access until then.
+- Legal review of every claim, badge and the method wording; keep the QA site (threatshadeqa.pages.dev) behind Cloudflare Access until then.
 
 ## Licence
 
