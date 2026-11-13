@@ -17,7 +17,8 @@
     "ucc.ie",
     "mapsvg.com",
     "cloudflare.com",
-    "dataprotection.ie"
+    "dataprotection.ie",
+    "github.com"
   ],
   "fetch_hosts": [
     "www.epa.ie",

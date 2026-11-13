@@ -205,15 +205,28 @@ def validate_sitka(g, r: Result | None = None) -> Result:
     if not isinstance(g, dict):
         r.err("sitka: top level must be an object")
         return r
-    allowed = {"version", "species", "source", "source_url", "fetched", "origin", "cell", "plots", "total_ha", "cells"}
+    allowed = {"version", "species", "method", "sources", "fetched", "origin", "cell", "plots",
+               "coillte_ha", "private_ha", "total_ha", "cells"}
     if set(g) - allowed:
         r.err(f"sitka: unexpected keys {sorted(set(g) - allowed)}")
-    if g.get("version") != 1:
-        r.err("sitka.version must be 1")
+    if g.get("version") != 2:
+        r.err("sitka.version must be 2")
     _text(r, "sitka.species", g.get("species"), 40)
-    _text(r, "sitka.source", g.get("source"), 120)
-    if not isinstance(g.get("source_url"), str) or not host_allowed(g["source_url"], allowlist()["link_hosts"]):
-        r.err("sitka.source_url: must be https on an allowlisted host")
+    _text(r, "sitka.method", g.get("method"), 120)
+    srcs = g.get("sources")
+    if not isinstance(srcs, list) or not (1 <= len(srcs) <= 5):
+        r.err("sitka.sources: between 1 and 5 sources required")
+        srcs = []
+    for k, s in enumerate(srcs):
+        if not isinstance(s, dict) or set(s) - {"name", "licence", "url"}:
+            r.err(f"sitka.sources[{k}]: must have only name, licence and url")
+            continue
+        _text(r, f"sitka.sources[{k}].name", s.get("name"), 80)
+        _text(r, f"sitka.sources[{k}].licence", s.get("licence"), 30)
+        if not isinstance(s.get("url"), str) or not host_allowed(s["url"], allowlist()["link_hosts"]):
+            r.err(f"sitka.sources[{k}].url: must be https on an allowlisted host")
+    _num(r, "sitka.coillte_ha", g.get("coillte_ha"), 0, 1_000_000, integer=True)
+    _num(r, "sitka.private_ha", g.get("private_ha"), 0, 1_000_000, integer=True)
     try:
         dt.date.fromisoformat(str(g.get("fetched")))
     except ValueError:
@@ -241,6 +254,8 @@ def validate_sitka(g, r: Result | None = None) -> Result:
         total += cell[2]
     if not r.errors and g.get("total_ha") != total:
         r.err("sitka.total_ha does not match the sum of the cells")
+    if not r.errors and abs(g["coillte_ha"] + g["private_ha"] - total) > max(50, 0.01 * total):
+        r.err("sitka.coillte_ha + private_ha does not match total_ha")
     return r
 
 

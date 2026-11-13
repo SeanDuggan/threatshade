@@ -1,1 +1,25 @@
 * @SeanDuggan
+
+/site/*.html @trenchrabbit
+/site/app.js @trenchrabbit
+/site/styles.css @trenchrabbit
+/site/assets/fonts/ @trenchrabbit
+
+/site/data/data.json @Rasperskii
+/docs/research/ @Rasperskii
+/site/assets/logo.jpg @Rasperskii
+/site/favicon.svg @Rasperskii
+/site/favicon.ico @Rasperskii
+/site/icon-192.png @Rasperskii
+/site/icon-512.png @Rasperskii
+/site/site.webmanifest @Rasperskii
+
+/site/_headers @SeanDuggan
+/site/.well-known/ @SeanDuggan
+/site/security-policy.txt @SeanDuggan
+/.github/ @SeanDuggan
+/scripts/ @SeanDuggan
+/config/ @SeanDuggan
+/tests/ @SeanDuggan
+/SECURITY.md @SeanDuggan
+/docs/THREAT_MODEL.md @SeanDuggan

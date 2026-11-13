@@ -7,7 +7,7 @@
     "epa.ie", "irishtimes.com", "irishexaminer.com", "smartwatermagazine.com",
     "sustainabilityonline.net", "farmersjournal.ie", "donegallive.ie",
     "fisheriesireland.ie", "catchments.ie", "agriland.ie", "europa.eu",
-    "bnm.ie", "leinsterexpress.ie", "data.gov.ie", "ucc.ie", "mapsvg.com", "cloudflare.com", "dataprotection.ie"
+    "bnm.ie", "leinsterexpress.ie", "data.gov.ie", "ucc.ie", "mapsvg.com", "cloudflare.com", "dataprotection.ie", "github.com"
   ];
   var NS = "http://www.w3.org/2000/svg";
   function h(tag, attrs, children) {
@@ -185,12 +185,17 @@
       swatches.appendChild(h("span", null, [h("i", { "class": "sw s" + (i + 1) }), label]));
     });
     keyEl.appendChild(swatches);
-    var url = safeUrl(g.source_url);
-    keyEl.appendChild(h("p", null, [
-      "Coillte forest where Sitka spruce is the main species, added up in squares of about 5 km (" + Math.round(g.total_ha).toLocaleString("en-IE") + " ha in total). Source: ",
-      url ? h("a", { href: url, rel: "noopener noreferrer", text: g.source }) : g.source,
-      ", fetched " + g.fetched + "."
-    ]));
+    function ha(v) { return Math.round(v).toLocaleString("en-IE") + " ha"; }
+    var credit = h("p", null, [
+      "Hectares of Sitka spruce in state (Coillte) and private forests, added up in squares of about 5 km: " + ha(g.total_ha) + " in total, " + ha(g.coillte_ha) + " Coillte and " + ha(g.private_ha) + " private. Mixed plots count only their Sitka share. Sources: "
+    ]);
+    (g.sources || []).forEach(function (src, i) {
+      var url = safeUrl(src.url), label = src.name + " (" + src.licence + ")";
+      if (i) credit.appendChild(document.createTextNode("; "));
+      credit.appendChild(url ? h("a", { href: url, rel: "noopener noreferrer", text: label }) : document.createTextNode(label));
+    });
+    credit.appendChild(document.createTextNode(". Updated " + g.fetched + "."));
+    keyEl.appendChild(credit);
     var btn = h("button", { type: "button", "class": "chip sitka-toggle", "aria-pressed": "false", text: "Show Sitka spruce plantations" });
     btn.addEventListener("click", function () {
       var on = btn.getAttribute("aria-pressed") !== "true";

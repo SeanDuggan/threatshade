@@ -228,13 +228,13 @@ import build_sitka
 
 class SitkaGrid(unittest.TestCase):
     def sample(self):
-        return build_sitka.grid([(53.01, -8.01, 10.0), (53.02, -8.02, 5.5), (54.5, -7.0, 2.4), (49.0, -8.0, 99.0)])
+        return build_sitka.grid([(53.01, -8.01, 10.0), (53.02, -8.02, 5.5), (49.0, -8.0, 99.0)], [(54.5, -7.0, 2.4)])
 
-    def test_grid_adds_up_plots_in_the_same_square(self):
+    def test_grid_adds_up_both_sources(self):
         g = self.sample()
-        self.assertEqual(g["plots"], 3)
         self.assertEqual(len(g["cells"]), 2)
         self.assertEqual(g["total_ha"], 16 + 2)
+        self.assertEqual((g["coillte_ha"], g["private_ha"]), (16, 2))
         self.assertEqual(validate.validate_sitka(g).errors, [])
 
     def test_validator_rejects_bad_cells(self):
@@ -243,16 +243,73 @@ class SitkaGrid(unittest.TestCase):
             g["cells"].append(bad)
             self.assertTrue(validate.validate_sitka(g).errors, bad)
 
-    def test_validator_rejects_wrong_total_and_unknown_keys(self):
+    def test_validator_rejects_wrong_totals_unknown_keys_and_bad_sources(self):
         g = self.sample(); g["total_ha"] += 1
         self.assertTrue(validate.validate_sitka(g).errors)
+        g = self.sample(); g["private_ha"] += 500
+        self.assertTrue(validate.validate_sitka(g).errors)
         g = self.sample(); g["script"] = "x"
+        self.assertTrue(validate.validate_sitka(g).errors)
+        g = self.sample(); g["sources"][0]["url"] = "https://evil.example/"
         self.assertTrue(validate.validate_sitka(g).errors)
 
     def test_published_grid_is_valid(self):
         g = common.load_json(common.SITKA_PATH)
         self.assertEqual(validate.validate_sitka(g).errors, [])
-        self.assertGreater(g["total_ha"], 100_000)
+        self.assertGreater(g["coillte_ha"], 100_000)
+        self.assertGreater(g["private_ha"], 100_000)
+
+    def test_itm_conversion_matches_known_point(self):
+        lat, lng = build_sitka.itm_to_latlng(715830, 734697)
+        self.assertAlmostEqual(lat, 53.3498, places=3)
+        self.assertAlmostEqual(lng, -6.2603, places=3)
+
+    def test_only_the_sitka_share_counts(self):
+        self.assertAlmostEqual(build_sitka.sitka_share([("SS", 60), ("NS", 40)]), 0.6)
+        self.assertEqual(build_sitka.sitka_share([("BMO", 100)]), 0)
+
+    def test_reads_private_shapefile_from_zip(self):
+        import io, struct, tempfile, zipfile
+
+        def shp(boxes):
+            recs = b""
+            for k, (x0, y0, x1, y1) in enumerate(boxes, 1):
+                body = struct.pack("<i4d", 15, x0, y0, x1, y1) + b"\0" * 8
+                recs += struct.pack(">II", k, len(body) // 2) + body
+            head = struct.pack(">I", 9994) + b"\0" * 20 + struct.pack(">I", (100 + len(recs)) // 2)
+            return head + struct.pack("<ii", 1000, 15) + b"\0" * 64 + recs
+
+        def dbf(rows):
+            fields = [("Sp_1", 10), ("SpPerc_1", 10), ("Sp_2", 10), ("SpPerc_2", 10), ("LUC", 10), ("Area_ha", 10)]
+            rl = 1 + sum(l for _, l in fields)
+            hl = 32 + 32 * len(fields) + 1
+            out = bytearray(b"\x03" + b"\0" * 3 + struct.pack("<IHH", len(rows), hl, rl) + b"\0" * 20)
+            for nm, l in fields:
+                out += nm.encode().ljust(11, b"\0") + b"C" + b"\0" * 4 + bytes([l]) + b"\0" * 15
+            out += b"\x0d"
+            for r in rows:
+                out += b" " + b"".join(str(r.get(nm, "")).encode().ljust(l)[:l] for nm, l in fields)
+            return bytes(out)
+
+        rows = [{"Sp_1": "SS", "SpPerc_1": 60, "Sp_2": "NS", "SpPerc_2": 40, "LUC": "CHF", "Area_ha": 10},
+                {"Sp_1": "SS", "SpPerc_1": 100, "LUC": "Road", "Area_ha": 5},
+                {"Sp_1": "BMO", "SpPerc_1": 100, "LUC": "BHF", "Area_ha": 7}]
+        boxes = [(715800, 734600, 715900, 734800)] * 3
+        tmp = tempfile.NamedTemporaryFile(suffix=".zip", delete=False); tmp.close()
+        with zipfile.ZipFile(tmp.name, "w") as z:
+            z.writestr(build_sitka.PRIVATE_STEM + ".shp", shp(boxes))
+            z.writestr(build_sitka.PRIVATE_STEM + ".dbf", dbf(rows))
+        old = build_sitka.MIN_PLOTS
+        try:
+            build_sitka.MIN_PLOTS = 1
+            plots = build_sitka.read_private(tmp.name)
+        finally:
+            build_sitka.MIN_PLOTS = old
+            Path(tmp.name).unlink()
+        self.assertEqual(len(plots), 1)
+        lat, lng, ha = plots[0]
+        self.assertAlmostEqual(ha, 6.0)
+        self.assertAlmostEqual(lat, 53.35, places=2)
 
     def test_build_only_contacts_allowlisted_host(self):
         self.assertTrue(common.host_allowed(build_sitka.LAYER, common.allowlist()["fetch_hosts"]))

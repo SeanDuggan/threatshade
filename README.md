@@ -1,114 +1,57 @@
 # Threatshade: Ireland's Polluter Scoreboard
 
-A static web app that ranks Ireland's worst polluters on a map and a scoreboard, using public records: EU ETS carbon figures, the EPA's National Priority Sites list, EPA and DPP prosecutions, wastewater reports and habitat sensitivity. Every score is linked to its sources.
+A static web app that ranks Ireland's worst polluters on a map and a scoreboard, using public records: EU ETS carbon figures, the EPA's National Priority Sites list, EPA and DPP prosecutions, wastewater reports and habitat sensitivity. Every score links to its sources.
 
-The site has no server, database, login or forms. It is plain HTML, CSS and JavaScript plus one JSON data file, so it can be served from Cloudflare Pages.
+There is no server, database, login or form: just HTML, CSS, JavaScript and JSON, served by Cloudflare Pages. QA: https://threatshadeqa.pages.dev (qa.threatshade.com to follow).
 
-## Repository layout
+## Layout
 
 ```
-site/                    What gets deployed (Cloudflare Pages output directory)
-  index.html             Page markup; no inline scripts or styles
-  404.html               Shown for unknown URLs (Cloudflare Pages returns it with a 404 status)
-  favicon.svg, favicon.ico, icon-192.png, icon-512.png, site.webmanifest
-                         Browser and home-screen icons (red "//" mark; iPhones use assets/logo.jpg)
-  styles.css             All styling
-  app.js                 Scoring, map and scoreboard; renders data with DOM APIs only
-  data/data.json         The polluters, scores inputs, evidence and sources
-  data/ireland-map.json  County outlines (from the MapSVG Ireland map, CC0), as plain integer rings
-  data/sitka-grid.json   Sitka spruce overlay: Coillte hectares per ~5 km square (CC BY 4.0)
-  assets/logo.jpg        Threatshade logo
-  assets/fonts/          Self-hosted fonts (woff2) and their OFL licences
-  _headers               Security headers for Cloudflare Pages (CSP, HSTS, etc.)
-  .well-known/security.txt  Security contact (RFC 9116); renew Expires yearly
-  security-policy.txt    Vulnerability disclosure policy
-scripts/
-  common.py              Shared helpers and the Python copy of the scoring formula
-  fetch_updates.py       Weekly fetch from EPA sources (standard library only)
-  validate.py            Strict validation of data.json and the map, plus change warnings
-  build_map.py           Rebuilds ireland-map.json from the MapSVG source SVG (only when needed)
-  build_sitka.py         Rebuilds sitka-grid.json from Coillte's Forest Inventory service
-config/link_allowlist.json   Hosts that source links and the fetcher may use
-data/state/              What the fetcher saw last time (for change detection)
-tests/                   Unit tests (python3 -m unittest discover -s tests -v)
-.github/workflows/       Weekly refresh (opens a PR) and PR validation
-docs/THREAT_MODEL.md     Inputs for the threat model
-SECURITY.md              Security controls and how to report a problem
+site/                  Everything that is deployed (Cloudflare Pages output directory)
+  index.html, 404.html, privacy.html
+  app.js, styles.css   Scoring, map and scoreboard; data is rendered with DOM APIs only
+  data/                data.json (polluters, evidence, sources), ireland-map.json, sitka-grid.json
+  assets/              Logo, team avatars, self-hosted fonts (OFL)
+  _headers             Security headers (CSP, HSTS and others)
+  .well-known/security.txt, security-policy.txt
+  favicon.*, icon-*.png, site.webmanifest
+scripts/               Python, standard library only: fetch_updates, validate, build_map, build_sitka
+config/                link_allowlist.json: hosts that links and fetchers may use
+data/state/            What the weekly fetcher saw last time
+tests/                 python3 -m unittest discover -s tests
+docs/                  Threat model and research notes
 ```
 
 ## Run it locally
 
-`fetch()` does not work from `file://`, so serve the folder:
-
 ```bash
 python3 -m http.server 8000 --directory site
-# then open http://localhost:8000
-```
-
-Run the checks:
-
-```bash
-python3 -m unittest discover -s tests -v
+python3 -m unittest discover -s tests
 python3 scripts/validate.py
 ```
 
-No packages need installing. Everything uses the Python 3.10+ standard library.
+Then open http://localhost:8000 (`fetch()` does not work from `file://`). Python 3.10+, nothing to install.
 
-## The county map
+## Data
 
-County boundaries come from MapSVG's geo-calibrated Ireland map (https://mapsvg.com/maps/ireland/, CC0 1.0, no attribution required; credited on the page anyway). The SVG is not served or embedded. `scripts/build_map.py` converts it into `site/data/ireland-map.json`, which holds only county codes, names and integer outlines, and the app draws the shapes itself. The source map uses a Mercator projection within its stated bounds; `app.js` and `scripts/common.py` share that projection, and a test checks that known towns land in the right county.
+- **Scoreboard:** edit `site/data/data.json` by hand, update `last_reviewed`, run the tests and validator, and open a pull request. Every claim needs a source on an allowlisted host.
+- **Weekly update:** every Monday a workflow checks the EPA priority sites list, prosecutions pages and LEAP API. It only changes priority-list status by itself, and only on an exact name match; everything else goes into a report. If anything changed it opens a pull request for review.
+- **County map:** from MapSVG's Ireland map (CC0), converted to integer outlines by `build_map.py`; no SVG markup reaches the page. To refresh: download `https://mapsvg.com/maps/geo-calibrated/ireland.svg` and run `python3 scripts/build_map.py ireland.svg`.
+- **Sitka spruce overlay** (off by default): hectares of Sitka per ~5 km square, from the Coillte Forest Inventory and the DAFM Private Forest Estate 2023 (both CC BY 4.0). Each plot counts its area times Sitka's share, stocked forest only. Only 5 km totals are published, never plot shapes or owners. To refresh, download the DAFM zip from [data.gov.ie](https://data.gov.ie/dataset/dafm-private-forest-estate-2023) (its server blocks scripts) and run `python3 scripts/build_sitka.py --private path/to/privateforests2023.zip`.
 
-To refresh the geometry: download `https://mapsvg.com/maps/geo-calibrated/ireland.svg`, run `python3 scripts/build_map.py ireland.svg`, then run the tests.
+## Security
 
-The validator warns if any polluter's site falls outside every county, which catches mistyped coordinates.
+See `SECURITY.md` and `docs/THREAT_MODEL.md`. Reports go to security@threatshade.com. The `security.txt` expiry (2027-11-01) must be renewed before then.
 
-## The Sitka spruce overlay
+Repository settings in place: read-only default workflow token, Actions allowed to open pull requests, Dependabot alerts and security updates, CODEOWNERS. Branch protection and secret scanning need the repository to be public (or GitHub Pro), so turn them on at launch.
 
-The map has a "Show Sitka spruce plantations" button. It shades squares of about 5 km by the hectares of Coillte forest where Sitka spruce is the main species (`SPP1 = 'SS'` in Coillte's public Forest Inventory, published on data.gov.ie under CC BY 4.0, with credit to Coillte required). It is context only and does not affect any score. Private forests are not included yet; the Department of Agriculture's private forest estate dataset could be added the same way.
+## Deploy
 
-`scripts/build_sitka.py` asks Coillte's ArcGIS service for the centre point and area of each Sitka plot (no shapes), adds them up per square, and writes `site/data/sitka-grid.json`. Visitors only ever load that file from the site itself. The script uses the same fetcher as the weekly job, so it can only contact allowlisted hosts (`services7.arcgis.com` is in `config/link_allowlist.json`), and the validator checks every cell.
-
-To refresh it (Coillte updates the inventory about once a year):
-
-```bash
-python3 scripts/build_sitka.py
-python3 scripts/validate.py
-```
-
-## How the weekly update works
-
-1. Every Monday the `weekly-data-update` workflow runs `scripts/fetch_updates.py`.
-2. The fetcher checks the EPA priority sites list, the EPA prosecutions pages and the EPA LEAP open-data API.
-3. It only changes one thing automatically: a polluter's priority-list status (`current` or `past`). New prosecutions, new priority sites and LEAP changes are written to a report for a human to act on.
-4. `scripts/validate.py` checks the result and compares it with what is live.
-5. If anything changed, the workflow opens a pull request with the report as its description. Nothing goes live until you review and merge it.
-
-To edit data by hand, change `site/data/data.json`, update `last_reviewed`, run the tests and open a pull request.
-
-## Publish to GitHub (account SeanDuggan)
-
-```bash
-# create an empty private repo called "threatshade" on GitHub first, then:
-git remote add origin https://github.com/SeanDuggan/threatshade.git
-git push -u origin main
-```
-
-Then in the repository settings:
-
-- **Branch protection on `main`:** require a pull request, require the `validate` check, require review from Code Owners, block force pushes. *Not available yet:* GitHub only offers branch protection (and rulesets) on private repositories with a paid Pro plan, so set this up when the repository goes public or the account is upgraded. Until then, nothing technically stops a direct push to `main`.
-- **Actions > General:** workflow permissions "Read repository contents"; allow GitHub Actions to create pull requests (needed for the weekly PR). *Done (13 Nov 2026).*
-- **Security:** Dependabot alerts and Dependabot security updates are on (13 Nov 2026). Secret scanning is not available for free private repositories; it can be turned on once the repository is public. Use two-factor authentication on the account.
-- Note: pull requests opened with the built-in token do not trigger other workflows. The weekly job runs the tests and validation itself, then starts the `validate` workflow on its branch (`workflow_dispatch`) so the required `test` check appears on the weekly PR.
-
-## Deploy to Cloudflare Pages (after the threat model)
-
-- Connect the GitHub repo, production branch `main`.
-- Build command: none. Build output directory: `site`. Only `site/` is published, so repo docs (`*.md`) never go live; a test fails the build if any Markdown file is placed in `site/`.
-- `site/_headers` sets the security headers. Check them after the first deploy with `curl -sI https://<your-domain>/`.
-- Turn off preview deployments for pull requests from forks, or keep the repo private.
+Cloudflare Pages builds from `main` with no build command and output directory `site`, so only `site/` is published (a test fails if any Markdown file lands there). Check the headers after a deploy with `curl -sI https://threatshadeqa.pages.dev/`.
 
 ## Before going public
 
-- Get legal advice on naming companies. Every claim must stay tied to a source, and the method and disclaimer must stay on the page.
-- Verify the pinned GitHub Action commit (`actions/checkout`, pinned to the v4.2.2 commit) against the official release page. Dependabot will propose updates.
-- Add a licence file if you want others to reuse the code or data.
+- Legal review of every claim, badge and the method wording; keep QA behind Cloudflare Access until then.
+- A corrections and right-of-reply page.
+- Turn on branch protection and secret scanning once the repository is public.
+- Add a licence for the code and data if others should reuse them.
