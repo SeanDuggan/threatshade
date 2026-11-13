@@ -15,7 +15,9 @@
     "leinsterexpress.ie",
     "data.gov.ie",
     "ucc.ie",
-    "mapsvg.com"
+    "mapsvg.com",
+    "cloudflare.com",
+    "dataprotection.ie"
   ],
   "fetch_hosts": [
     "www.epa.ie",

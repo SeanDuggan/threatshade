@@ -95,9 +95,9 @@ git push -u origin main
 
 Then in the repository settings:
 
-- **Branch protection on `main`:** require a pull request, require the `validate` check, require review from Code Owners, block force pushes.
-- **Actions > General:** workflow permissions "Read repository contents"; allow GitHub Actions to create pull requests (needed for the weekly PR).
-- **Security:** turn on Dependabot alerts and secret scanning. Use two-factor authentication on the account.
+- **Branch protection on `main`:** require a pull request, require the `validate` check, require review from Code Owners, block force pushes. *Not available yet:* GitHub only offers branch protection (and rulesets) on private repositories with a paid Pro plan, so set this up when the repository goes public or the account is upgraded. Until then, nothing technically stops a direct push to `main`.
+- **Actions > General:** workflow permissions "Read repository contents"; allow GitHub Actions to create pull requests (needed for the weekly PR). *Done (13 Nov 2026).*
+- **Security:** Dependabot alerts and Dependabot security updates are on (13 Nov 2026). Secret scanning is not available for free private repositories; it can be turned on once the repository is public. Use two-factor authentication on the account.
 - Note: pull requests opened with the built-in token do not trigger other workflows. The weekly job runs the tests and validation itself, then starts the `validate` workflow on its branch (`workflow_dispatch`) so the required `test` check appears on the weekly PR.
 
 ## Deploy to Cloudflare Pages (after the threat model)
