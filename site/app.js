@@ -233,19 +233,28 @@
     if (btnBox.firstChild) { legend.insertBefore(keysBox, legend.firstChild); legend.insertBefore(btnBox, legend.firstChild); }
     updateNativeFact(grids);
   }
-  function updateNativeFact(grids) {
-    var sitka = grids[0], native = grids[1];
-    var total = document.getElementById("native-total"), text = document.getElementById("native-fact"), link = document.getElementById("native-fact-link");
-    if (!native || !num(native.total_ha, 1, 5000000) || !total) return;
-    total.textContent = ha(native.total_ha);
-    if (text && sitka && num(sitka.total_ha, 1, 5000000)) text.textContent = "of native trees in Irish state and private forests, against " + ha(sitka.total_ha) + " of Sitka spruce";
+  function linkToLayer(linkId, layerKey) {
+    var link = document.getElementById(linkId);
     if (link) link.addEventListener("click", function (e) {
-      var btn = document.querySelector(".tree-toggle.native");
+      var btn = document.querySelector(".tree-toggle." + layerKey);
       if (!btn) return;
       e.preventDefault();
       if (btn.getAttribute("aria-pressed") !== "true") btn.click();
       document.getElementById("map").scrollIntoView({ behavior: smooth(), block: "start" });
     });
+  }
+  function updateNativeFact(grids) {
+    var native = grids[1], total = document.getElementById("native-total");
+    if (native && num(native.total_ha, 1, 5000000) && total) total.textContent = ha(native.total_ha);
+    linkToLayer("native-fact-link", "native");
+    linkToLayer("nonnative-fact-link", "sitka");
+  }
+  function updateNonNativeFact(summary, grids) {
+    var t = summary && summary.total, total = document.getElementById("nonnative-total"), text = document.getElementById("nonnative-fact");
+    var sitka = grids && grids[0] && num(grids[0].total_ha, 1, 5000000) ? grids[0].total_ha : t && t.sitka;
+    if (!t || !num(t.non_native, 1, 5000000) || !num(sitka, 0, t.non_native) || !total) return;
+    total.textContent = ha(t.non_native);
+    if (text) text.textContent = "or more of non-native trees in the same forests, " + ha(sitka) + " of it Sitka spruce";
   }
   function inCounty(p) { return !countyFilter || p.counties.indexOf(countyFilter) >= 0; }
   function visible(p) { return (sectorFilter === "All" || p.sector === sectorFilter) && inCounty(p); }
@@ -470,6 +479,10 @@
     function get(url) { return fetch(url, { credentials: "same-origin" }).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }); }
     var gridReqs = TREE_LAYERS.map(function (cfg) { return get(cfg.url).catch(function () { return null; }); });
     Promise.all([get(DATA_URL), get(MAP_URL)].concat(gridReqs))
-      .then(function (res) { start(res[0], res[1], res.slice(2)); }).catch(fail);
+      .then(function (res) {
+        var grids = res.slice(2);
+        start(res[0], res[1], grids);
+        get("data/forest-summary.json").then(function (s) { updateNonNativeFact(s, grids); }).catch(function () {});
+      }).catch(fail);
   });
 })();

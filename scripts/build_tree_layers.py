@@ -12,7 +12,7 @@ import urllib.parse
 import zipfile
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
-from common import NATIVE_PATH, SITKA_PATH, allowlist, write_json
+from common import NATIVE_PATH, SITKA_PATH, SUMMARY_PATH, allowlist, write_json
 import fetch_updates
 
 LAYER = "https://services7.arcgis.com/6LSAdqgf43oKRpP6/arcgis/rest/services/Coillte_Boundaries_Consultation/FeatureServer/4"
@@ -25,6 +25,9 @@ MAX_I, MAX_J = 80, 90
 MIN_PLOTS, MAX_PLOTS = 20_000, 400_000
 NATIVE = {"OAK", "PO", "SO", "BI", "DBI", "SBI", "ALD", "ASH", "HAZ", "HOL", "YEW", "ROW", "RWN",
           "SAL", "WIL", "EWIL", "ELM", "HAW", "SP"}
+NON_NATIVE = {"SS", "NS", "SERBS", "LP", "LPS", "LPN", "LPL", "LPI", "LPSC", "LPNC", "DF", "JL", "EL", "HL",
+              "NF", "GF", "SF", "OF", "WRC", "WH", "CP", "MP", "LC", "MC", "BE", "SYC", "NM", "EUC", "HBN"}
+TOTAL_KEYS = ("stocked", "native", "non_native", "sitka")
 LAYERS = {
     "sitka": {"species": "Sitka spruce", "codes": {"SS"}, "path": SITKA_PATH,
               "method": "Plot area x Sitka spruce share of the plot, stocked forest only"},
@@ -100,6 +103,28 @@ def _split(plot_pairs, lat, lng, area, out):
         sh = share(plot_pairs, layer["codes"])
         if sh > 0:
             out[key].append((lat, lng, area * sh))
+    t = out.setdefault("_totals", {k: 0.0 for k in TOTAL_KEYS})
+    t["stocked"] += area
+    t["native"] += area * share(plot_pairs, NATIVE)
+    t["non_native"] += area * share(plot_pairs, NON_NATIVE)
+    t["sitka"] += area * share(plot_pairs, {"SS"})
+
+
+def summarise(coillte_totals: dict, private_totals: dict) -> dict:
+    def block(t):
+        b = {k: round(t.get(k, 0.0)) for k in ("stocked", "native", "non_native", "sitka")}
+        b["unspecified"] = max(0, b["stocked"] - b["native"] - b["non_native"])
+        return b
+    c, p = block(coillte_totals), block(private_totals)
+    return {
+        "version": 1,
+        "method": "Plot area x share of each species, stocked forest only. Unspecified covers mixes whose species are not recorded.",
+        "sources": [dict(s) for s in SOURCES],
+        "fetched": dt.date.today().isoformat(),
+        "coillte": c,
+        "private": p,
+        "total": {k: c[k] + p[k] for k in c},
+    }
 
 
 def fetch_coillte() -> dict[str, list]:
@@ -218,7 +243,7 @@ def grid(coillte, private, layer: str = "sitka") -> dict:
         "version": 2,
         "species": LAYERS[layer]["species"],
         "method": LAYERS[layer]["method"],
-        "sources": SOURCES,
+        "sources": [dict(s) for s in SOURCES],
         "fetched": dt.date.today().isoformat(),
         "origin": ORIGIN,
         "cell": CELL,
@@ -239,6 +264,9 @@ def main(argv=None) -> int:
     for key in LAYERS:
         print(f"private {key}: {len(private[key])} plots, {round(sum(p[2] for p in private[key]))} ha", file=sys.stderr)
     coillte = fetch_coillte()
+    summary = summarise(coillte.get("_totals", {}), private.get("_totals", {}))
+    write_json(SUMMARY_PATH, summary)
+    print(f"summary: {summary['total']} -> {SUMMARY_PATH}")
     for key, layer in LAYERS.items():
         out = grid(coillte[key], private[key], key)
         write_json(layer["path"], out)

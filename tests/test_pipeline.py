@@ -362,3 +362,32 @@ class PointsBasis(unittest.TestCase):
     def test_page_only_shows_reviewed_reasons(self):
         js = (ROOT / "site/app.js").read_text(encoding="utf-8")
         self.assertIn("basis.reviewed === true", js)
+
+
+class ForestSummary(unittest.TestCase):
+    def sample(self):
+        return build_sitka.summarise({"stocked": 100.4, "native": 10, "non_native": 70, "sitka": 50},
+                                     {"stocked": 50, "native": 5, "non_native": 30, "sitka": 20})
+
+    def test_summary_adds_up(self):
+        s = self.sample()
+        self.assertEqual(s["total"], {"stocked": 150, "native": 15, "non_native": 100, "sitka": 70, "unspecified": 35})
+        self.assertEqual(validate.validate_forest_summary(s).errors, [])
+
+    def test_validator_rejects_inconsistent_summary(self):
+        s = self.sample(); s["total"]["native"] += 1
+        self.assertTrue(validate.validate_forest_summary(s).errors)
+        s = self.sample(); s["coillte"]["sitka"] = s["coillte"]["non_native"] + 1
+        self.assertTrue(validate.validate_forest_summary(s).errors)
+        s = self.sample(); s["sources"][0]["url"] = "https://evil.example/"
+        self.assertTrue(validate.validate_forest_summary(s).errors)
+
+    def test_native_and_non_native_lists_do_not_overlap(self):
+        self.assertFalse(build_sitka.NATIVE & build_sitka.NON_NATIVE)
+        self.assertIn("SS", build_sitka.NON_NATIVE)
+        self.assertIn("SP", build_sitka.NATIVE)
+
+    def test_published_summary_is_valid(self):
+        s = common.load_json(common.SUMMARY_PATH)
+        self.assertEqual(validate.validate_forest_summary(s).errors, [])
+

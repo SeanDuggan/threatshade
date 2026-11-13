@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "method": "Plot area x share of each species, stocked forest only. Unspecified covers mixes whose species are not recorded.",
+  "sources": [
+    {
+      "name": "Coillte Forest Inventory",
+      "licence": "CC BY 4.0",
+      "url": "https://data.gov.ie/en_GB/dataset/coilltepublicboundaries"
+    },
+    {
+      "name": "DAFM Private Forest Estate 2023",
+      "licence": "CC BY 4.0",
+      "url": "https://data.gov.ie/dataset/dafm-private-forest-estate-2023"
+    }
+  ],
+  "fetched": "2026-11-13",
+  "coillte": {
+    "stocked": 349903,
+    "native": 32794,
+    "non_native": 311308,
+    "sitka": 231163,
+    "unspecified": 5801
+  },
+  "private": {
+    "stocked": 388401,
+    "native": 46894,
+    "non_native": 259532,
+    "sitka": 190428,
+    "unspecified": 81975
+  },
+  "total": {
+    "stocked": 738304,
+    "native": 79688,
+    "non_native": 570840,
+    "sitka": 421591,
+    "unspecified": 87776
+  }
+}

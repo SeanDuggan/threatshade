@@ -9,7 +9,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
-from common import (DATA_PATH, MAP_PATH, REPORT_PATH, RING_RE, ROOT, NATIVE_PATH, SITKA_PATH, allowlist, area_at,
+from common import (DATA_PATH, MAP_PATH, REPORT_PATH, RING_RE, ROOT, NATIVE_PATH, SITKA_PATH, SUMMARY_PATH, allowlist, area_at,
                     decode_ring, host_allowed, load_json, score)
 
 SECTORS = {"Water utility", "Dairy & food", "Chemicals", "Heavy industry", "Power", "Aviation",
@@ -268,6 +268,53 @@ def validate_tree_grid(g, r: Result | None = None, label: str = "sitka") -> Resu
     return r
 
 
+SUMMARY_BLOCK = ("stocked", "native", "non_native", "sitka", "unspecified")
+
+
+def validate_forest_summary(s, r: Result | None = None) -> Result:
+    r = r or Result()
+    if not isinstance(s, dict):
+        r.err("forest summary: top level must be an object")
+        return r
+    allowed = {"version", "method", "sources", "fetched", "coillte", "private", "total"}
+    if set(s) - allowed:
+        r.err(f"forest summary: unexpected keys {sorted(set(s) - allowed)}")
+    if s.get("version") != 1:
+        r.err("forest summary.version must be 1")
+    _text(r, "forest summary.method", s.get("method"), 250)
+    try:
+        dt.date.fromisoformat(str(s.get("fetched")))
+    except ValueError:
+        r.err("forest summary.fetched must be an ISO date")
+    srcs = s.get("sources")
+    if not isinstance(srcs, list) or not srcs:
+        r.err("forest summary.sources: at least one source required")
+        srcs = []
+    for k, src in enumerate(srcs):
+        if not isinstance(src, dict) or not isinstance(src.get("url"), str) or not host_allowed(src["url"], allowlist()["link_hosts"]):
+            r.err(f"forest summary.sources[{k}]: url must be https on an allowlisted host")
+    blocks = {}
+    for name in ("coillte", "private", "total"):
+        b = s.get(name)
+        if not isinstance(b, dict) or set(b) != set(SUMMARY_BLOCK):
+            r.err(f"forest summary.{name}: must have exactly {', '.join(SUMMARY_BLOCK)}")
+            continue
+        for k in SUMMARY_BLOCK:
+            _num(r, f"forest summary.{name}.{k}", b.get(k), 0, 5_000_000, integer=True)
+        blocks[name] = b
+    if r.errors:
+        return r
+    for name, b in blocks.items():
+        if b["sitka"] > b["non_native"]:
+            r.err(f"forest summary.{name}: Sitka cannot exceed non-native")
+        if abs(b["native"] + b["non_native"] + b["unspecified"] - b["stocked"]) > 2:
+            r.err(f"forest summary.{name}: native + non-native + unspecified must equal stocked")
+    for k in SUMMARY_BLOCK:
+        if blocks["total"][k] != blocks["coillte"][k] + blocks["private"][k]:
+            r.err(f"forest summary.total.{k} must equal Coillte + private")
+    return r
+
+
 def check_sites_on_land(data, m, r: Result) -> Result:
     for p in data.get("polluters", []):
         for s in p.get("sites", []):
@@ -335,6 +382,12 @@ def main(argv=None) -> int:
         validate_map(m, r)
         if not r.errors:
             check_sites_on_land(data, m, r)
+    if not SUMMARY_PATH.exists():
+        r.err("forest summary file missing (run scripts/build_tree_layers.py)")
+    elif len(SUMMARY_PATH.read_bytes()) > 20_000:
+        r.err("forest summary file too large")
+    else:
+        validate_forest_summary(load_json(SUMMARY_PATH), r)
     for label, path in (("sitka", SITKA_PATH), ("native", NATIVE_PATH)):
         if not path.exists():
             r.err(f"{label} grid file missing (run scripts/build_tree_layers.py)")

@@ -10,7 +10,7 @@ There is no server, database, login or form: just HTML, CSS, JavaScript and JSON
 site/                  Everything that is deployed (Cloudflare Pages output directory)
   index.html, 404.html, privacy.html, corrections.html
   app.js, styles.css   Scoring, map and scoreboard; data is rendered with DOM APIs only
-  data/                data.json (polluters, evidence, sources), ireland-map.json, sitka-grid.json, native-grid.json
+  data/                data.json (polluters, evidence, sources), ireland-map.json, sitka-grid.json, native-grid.json, forest-summary.json
   assets/              Logo, team avatars, self-hosted fonts (OFL)
   _headers             Security headers (CSP, HSTS and others)
   .well-known/security.txt, security-policy.txt
@@ -38,7 +38,7 @@ Then open http://localhost:8000 (`fetch()` does not work from `file://`). Python
 - **Reasons for hand-set points:** each polluter's `points_basis` explains its water, air and habitat points. They start as drafts (`"reviewed": false`) and only appear on the site, under "Why these points?", once a reviewer has checked them and set `"reviewed": true` in a pull request.
 - **Weekly update:** every Monday a workflow checks the EPA priority sites list, prosecutions pages and LEAP API. It only changes priority-list status by itself, and only on an exact name match; everything else goes into a report. If anything changed it opens a pull request for review.
 - **County map:** from MapSVG's Ireland map (CC0), converted to integer outlines by `build_map.py`; no SVG markup reaches the page. To refresh: download `https://mapsvg.com/maps/geo-calibrated/ireland.svg` and run `python3 scripts/build_map.py ireland.svg`.
-- **Tree layers** (both off by default): hectares of Sitka spruce, and of native species (oak, birch, alder, ash, Scots pine, hazel, holly, yew, rowan, willow, elm, hawthorn), per ~5 km square, from the Coillte Forest Inventory and the DAFM Private Forest Estate 2023 (both CC BY 4.0). Each plot counts its area times that species' share, stocked forest only. Broadleaf mixes with unrecorded species are left out of the native layer. Only 5 km totals are published, never plot shapes or owners. To refresh both, download the DAFM zip from [data.gov.ie](https://data.gov.ie/dataset/dafm-private-forest-estate-2023) (its server blocks scripts) and run `python3 scripts/build_tree_layers.py --private path/to/privateforests2023.zip`.
+- **Tree layers** (both off by default): hectares of Sitka spruce, and of native species (oak, birch, alder, ash, Scots pine, hazel, holly, yew, rowan, willow, elm, hawthorn), per ~5 km square, from the Coillte Forest Inventory and the DAFM Private Forest Estate 2023 (both CC BY 4.0). Each plot counts its area times that species' share, stocked forest only. Broadleaf mixes with unrecorded species are left out of the native layer. Only 5 km totals are published, never plot shapes or owners. The same build writes `forest-summary.json` (native, non-native, Sitka and unspecified hectares for Coillte, private and in total), which the headline tiles use; species whose mix isn't recorded count as unspecified, so native and non-native figures are minimums. To refresh both, download the DAFM zip from [data.gov.ie](https://data.gov.ie/dataset/dafm-private-forest-estate-2023) (its server blocks scripts) and run `python3 scripts/build_tree_layers.py --private path/to/privateforests2023.zip`.
 
 ## Security
 
