@@ -6,7 +6,7 @@
     "epa.ie", "irishtimes.com", "irishexaminer.com", "smartwatermagazine.com",
     "sustainabilityonline.net", "farmersjournal.ie", "donegallive.ie",
     "fisheriesireland.ie", "catchments.ie", "agriland.ie", "europa.eu",
-    "bnm.ie", "leinsterexpress.ie", "data.gov.ie"
+    "bnm.ie", "leinsterexpress.ie", "data.gov.ie", "npws.ie"
   ];
   var NS = "http://www.w3.org/2000/svg";
   function h(tag, attrs, children) {

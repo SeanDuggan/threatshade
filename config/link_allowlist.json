@@ -13,7 +13,8 @@
     "europa.eu",
     "bnm.ie",
     "leinsterexpress.ie",
-    "data.gov.ie"
+    "data.gov.ie",
+    "npws.ie"
   ],
   "fetch_hosts": [
     "www.epa.ie",

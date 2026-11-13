@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-11-12",
+  "last_reviewed": "2026-11-13",
   "sources": [
     {
       "id": 1,
@@ -181,6 +181,31 @@
       "id": 36,
       "title": "Irish Times: ESB to decommission Derrybrien wind farm's 70 turbines (Mar 2022)",
       "url": "https://www.irishtimes.com/business/energy-and-resources/esb-to-decommission-derrybrien-wind-farm-s-70-turbines-1.4828766"
+    },
+    {
+      "id": 37,
+      "title": "NPWS: Lower River Shannon SAC (002165), site synopsis",
+      "url": "https://www.npws.ie/sites/default/files/protected-sites/synopsis/SY002165.pdf"
+    },
+    {
+      "id": 38,
+      "title": "NPWS: Blackwater River (Cork/Waterford) SAC (002170), site synopsis",
+      "url": "https://www.npws.ie/sites/default/files/protected-sites/synopsis/SY002170.pdf"
+    },
+    {
+      "id": 39,
+      "title": "NPWS: River Finn SAC (002301), site record",
+      "url": "https://www.npws.ie/protected-sites/sac/002301"
+    },
+    {
+      "id": 40,
+      "title": "NPWS: South Dublin Bay SAC (000210), site record",
+      "url": "https://www.npws.ie/protected-sites/sac/000210"
+    },
+    {
+      "id": 41,
+      "title": "NPWS: Lough Gara SPA (004048), site synopsis",
+      "url": "https://www.npws.ie/sites/default/files/protected-sites/synopsis/SY004048.pdf"
     }
   ],
   "polluters": [
@@ -453,6 +478,11 @@
           "date": "Earlier case",
           "text": "Overloaded plants caused ammonia at ten times the limit, affecting freshwater pearl mussels downstream.",
           "source": 21
+        },
+        {
+          "date": "Designated",
+          "text": "Foynes and Glin discharge to the Shannon Estuary, part of the Lower River Shannon Special Area of Conservation, which is protected for species including freshwater pearl mussel and salmon.",
+          "source": 37
         }
       ],
       "note": "Uisce Éireann says it has eliminated most raw sewage discharges since 2014, and the EPA has acknowledged progress at priority areas.",
@@ -463,7 +493,7 @@
       "points_basis": {
         "water": "25: systemic failures. Daily raw sewage discharges from 11 towns [5], 55% of plants failing standards [6] and 35 successful EPA prosecutions [6].",
         "air": "No air or odour record in our sources.",
-        "habitat": "15: discharges into protected waters, including Foynes and Glin on the Shannon Estuary [5], and harm to freshwater pearl mussels downstream of overloaded plants [21].",
+        "habitat": "15: discharges into protected waters, including Foynes and Glin on the Shannon Estuary, part of the Lower River Shannon SAC [5] [37], and harm to freshwater pearl mussels downstream of overloaded plants [21].",
         "reviewed": false
       }
     },
@@ -518,6 +548,11 @@
           "date": "Q3 2024",
           "text": "Listed as a priority site, one of three milk processors on the list that quarter.",
           "source": 18
+        },
+        {
+          "date": "Designated",
+          "text": "The River Allow at Kanturk is a listed tributary within the Blackwater River (Cork/Waterford) Special Area of Conservation, protected for species including freshwater pearl mussel and salmon.",
+          "source": 38
         }
       ],
       "note": null,
@@ -527,7 +562,7 @@
       "points_basis": {
         "water": "18: a current EPA priority site over emissions to water and its wastewater plant [3]. Also convicted over discharges to the River Allow [34] [16].",
         "air": "No air or odour record in our sources.",
-        "habitat": "15: discharges to the River Allow, a tributary of the Munster Blackwater [34]. The method names the Blackwater as protected. Needs a source confirming the protected status.",
+        "habitat": "15: discharges to the River Allow, a listed tributary in the Blackwater River (Cork/Waterford) SAC, protected for freshwater pearl mussel and salmon [34] [38].",
         "reviewed": false
       }
     },
@@ -577,6 +612,11 @@
           "date": "2023",
           "text": "Reported 26,962 t CO₂ under the EU ETS.",
           "source": 12
+        },
+        {
+          "date": "Designated",
+          "text": "The River Lung is the main river flowing into Lough Gara, a Special Protection Area for internationally important populations of Whooper Swan and Greenland White-fronted Goose.",
+          "source": 41
         }
       ],
       "note": null,
@@ -586,7 +626,7 @@
       "points_basis": {
         "water": "15: court case over discharges to water. DPP prosecution with EUR 350,000 in fines and penalties [10] and payments for the River Lung [8].",
         "air": "0. Its past priority listing [10] is not recorded as being about air or odour.",
-        "habitat": "10: judgement for harm to the River Lung [8]. No source yet on whether the river is a protected site.",
+        "habitat": "10: harm to the River Lung [8], the main river feeding Lough Gara Special Protection Area [41]. Below 15 because the protected site is downstream rather than the river itself.",
         "reviewed": false
       }
     },
@@ -626,6 +666,11 @@
           "date": "Q2 2026",
           "text": "On the EPA's National Priority Sites list for groundwater contamination.",
           "source": 3
+        },
+        {
+          "date": "Designated",
+          "text": "Shannon, Co Clare sits on the Shannon and Fergus estuaries, part of the Lower River Shannon Special Area of Conservation.",
+          "source": 37
         }
       ],
       "note": null,
@@ -633,7 +678,7 @@
       "points_basis": {
         "water": "18: a current EPA priority site over groundwater contamination [3].",
         "air": "No air or odour record in our sources.",
-        "habitat": "8: judgement for groundwater contamination near the Shannon Estuary. The site location is approximate and no source yet confirms which protected area, if any, is affected.",
+        "habitat": "8: judgement. Shannon, Co Clare is on the estuary protected as the Lower River Shannon SAC [37], but the contamination recorded is of groundwater [3] and the site location is approximate, so no direct harm to the SAC is shown.",
         "reviewed": false
       }
     },
@@ -673,6 +718,11 @@
           "date": "2025",
           "text": "Reported 1.1 Mt CO₂ under the EU ETS, down just over 1.5%. Ireland's largest single industrial emitter.",
           "source": 2
+        },
+        {
+          "date": "Designated",
+          "text": "The Shannon Estuary, where the refinery stands, is part of the Lower River Shannon Special Area of Conservation, protected for habitats including estuaries and mudflats and species including salmon and bottle-nosed dolphin.",
+          "source": 37
         }
       ],
       "note": "The refinery sits on the Shannon Estuary, which is designated for protection, hence the maximum habitat score.",
@@ -680,7 +730,7 @@
       "points_basis": {
         "water": "No water pollution record in our sources.",
         "air": "No air or odour record in our sources.",
-        "habitat": "15: the refinery is on the Shannon Estuary, which is designated for protection. Needs a source added for the designation (for example the NPWS site record).",
+        "habitat": "15: the refinery is on the Shannon Estuary, part of the Lower River Shannon Special Area of Conservation [37].",
         "reviewed": false
       }
     },
@@ -745,6 +795,16 @@
           "date": "2003–2022",
           "text": "In October 2003 a peat slide during construction of ESB's Derrybrien wind farm in Co Galway moved about 250,000 tonnes of peat; Inland Fisheries Ireland estimated about 50,000 fish died along 18 km of river. The EU Court of Justice fined the State (not ESB) because no environmental impact assessment was done. In 2022 An Bord Pleanála refused substitute consent to ESB subsidiary Gort Windfarms, and ESB decided to decommission all 70 turbines. Background only: not counted in the score.",
           "source": 36
+        },
+        {
+          "date": "Designated",
+          "text": "Moneypoint is on the Shannon Estuary, part of the Lower River Shannon Special Area of Conservation.",
+          "source": 37
+        },
+        {
+          "date": "Designated",
+          "text": "Poolbeg is beside South Dublin Bay Special Area of Conservation, protected for its tidal mudflats and sandflats.",
+          "source": 40
         }
       ],
       "note": null,
@@ -752,7 +812,7 @@
       "points_basis": {
         "water": "0. The Derrybrien fish kill [36] is shown as background only and is not scored.",
         "air": "No air or odour record in our sources.",
-        "habitat": "12: judgement. Moneypoint is on the Shannon Estuary and Poolbeg on Dublin Bay. No source yet for the designations, and the score covers several sites.",
+        "habitat": "12: Moneypoint is on the Shannon Estuary (Lower River Shannon SAC) [37] and Poolbeg is beside South Dublin Bay SAC [40]. Below 15 because no discharge harm to those sites is recorded and the score covers several sites.",
         "reviewed": false
       }
     },
@@ -1219,6 +1279,11 @@
           "date": "Mar 2026",
           "text": "Residents told the court the smell was so bad they could not invite family to their homes.",
           "source": 14
+        },
+        {
+          "date": "Designated",
+          "text": "The River Finn Special Area of Conservation covers almost the entire river, which passes through Ballybofey, and is protected for salmon and otter.",
+          "source": 39
         }
       ],
       "note": null,
@@ -1228,7 +1293,7 @@
       "points_basis": {
         "water": "No water pollution record in our sources.",
         "air": "7: conviction over odour from the waste site [13].",
-        "habitat": "12: the site is on the banks of the River Finn [13]. Needs a source confirming the river's protected status.",
+        "habitat": "12: the waste site is on the banks of the River Finn [13], which is protected as the River Finn SAC for salmon and otter [39].",
         "reviewed": false
       }
     },
@@ -1325,6 +1390,11 @@
           "date": "2025",
           "text": "Emissions from dairy processors rose 3.6% while most other large emitters cut theirs.",
           "source": 1
+        },
+        {
+          "date": "Designated",
+          "text": "Listowel is on the River Feale, whose catchment is part of the Lower River Shannon Special Area of Conservation.",
+          "source": 37
         }
       ],
       "note": null,
@@ -1332,7 +1402,7 @@
       "points_basis": {
         "water": "No water pollution record in our sources.",
         "air": "No air or odour record in our sources.",
-        "habitat": "10: judgement, with no supporting source in the data yet. Needs a reason and source for the Listowel and Charleville sites, or a lower score.",
+        "habitat": "10: judgement. Listowel is on the River Feale, within the Lower River Shannon SAC [37], but no record of discharges from the plant to the river is in our sources yet. Charleville has no protected-site link recorded.",
         "reviewed": false
       }
     },
