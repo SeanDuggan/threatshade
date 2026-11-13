@@ -25,7 +25,14 @@
     "mapsvg.com",
     "cloudflare.com",
     "dataprotection.ie",
-    "github.com"
+    "github.com",
+    "gaelicwoodlandproject.com",
+    "rewildwicklow.ie",
+    "hometree.ie",
+    "nativewoodlandtrust.ie",
+    "ipcc.ie",
+    "iwt.ie",
+    "biodiversityireland.ie"
   ],
   "layer_fetch_hosts": [
     "services7.arcgis.com"
