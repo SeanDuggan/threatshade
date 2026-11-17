@@ -123,7 +123,7 @@
     return m;
   }
   var P = [], SOURCES = {}, sectorFilter = "All", countyFilter = null, selected = null;
-  var svg, markers, tip, board, rowEls = {}, countyEls = {};
+  var svg, markers, tip, board, treeBlur, rowEls = {}, countyEls = {};
   function drawBaseMap() {
     svg = document.getElementById("map");
     svg.setAttribute("viewBox", "-6 -6 " + (W + 12).toFixed(0) + " " + (H + 12).toFixed(0));
@@ -138,10 +138,15 @@
       s("line", { x1: x, x2: x, y1: -6, y2: H + 6 }, grid);
       s("text", { x: x + 3, y: H + 2, "class": "grid-label" }, grid).textContent = Math.abs(lng) + "°W";
     }
+    var defs = s("defs", {}, svg);
+    var landClip = s("clipPath", { id: "land-clip" }, defs);
+    var soft = s("filter", { id: "tree-soft", filterUnits: "userSpaceOnUse", x: -6, y: -6, width: (W + 12).toFixed(0), height: (H + 12).toFixed(0) }, defs);
+    treeBlur = s("feGaussianBlur", { stdDeviation: "2" }, soft);
     var land = s("g", { "class": "counties" }, svg);
     AREAS.forEach(function (a) {
       var d = a.rings.map(function (r) { return "M" + r.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join("L") + "Z"; }).join("");
       var ni = a.id === "GB-NIR";
+      s("path", { d: d }, landClip);
       var el = s("path", { "class": "county" + (ni ? " ni" : ""), d: d }, land);
       s("title", {}, el).textContent = a.name;
       if (!ni) {
@@ -154,7 +159,7 @@
     });
     var ni = AREAS.filter(function (a) { return a.id === "GB-NIR"; })[0];
     if (ni) { var c = proj(-6.75, 54.62); s("text", { x: c[0], y: c[1], "class": "ni-label", "text-anchor": "middle" }, svg).textContent = "N. IRELAND"; }
-    TREE_LAYERS.forEach(function (cfg) { treeGroups[cfg.key] = s("g", { "class": "tree-layer " + cfg.key, "aria-hidden": "true" }, svg); });
+    TREE_LAYERS.forEach(function (cfg) { treeGroups[cfg.key] = s("g", { "class": "tree-layer " + cfg.key, "aria-hidden": "true", "clip-path": "url(#land-clip)" }, svg); s("g", { filter: "url(#tree-soft)" }, treeGroups[cfg.key]); });
     markers = s("g", {}, svg);
     tip = document.getElementById("tip");
     var legend = document.getElementById("legend");
@@ -183,7 +188,9 @@
   }
   function ha(v) { return Math.round(v).toLocaleString("en-IE") + " ha"; }
   function drawTreeLayer(cfg, g, keysBox, btnBox) {
-    var group = treeGroups[cfg.key];
+    var group = treeGroups[cfg.key].firstChild;
+    var cellW = proj(g.origin.lng + g.cell.dlng, 53)[0] - proj(g.origin.lng, 53)[0];
+    treeBlur.setAttribute("stdDeviation", (cellW * 0.35).toFixed(2));
     g.cells.forEach(function (c) {
       var lng0 = g.origin.lng + c[0] * g.cell.dlng, lat0 = g.origin.lat + c[1] * g.cell.dlat;
       var a = proj(lng0, lat0 + g.cell.dlat), b = proj(lng0 + g.cell.dlng, lat0);
@@ -208,7 +215,7 @@
     function setOn(on) {
       btn.setAttribute("aria-pressed", String(on));
       btn.textContent = on ? cfg.hide : cfg.show;
-      group.setAttribute("class", "tree-layer " + cfg.key + (on ? " on" : ""));
+      treeGroups[cfg.key].setAttribute("class", "tree-layer " + cfg.key + (on ? " on" : ""));
       [keyEl, cfg.about && document.getElementById(cfg.about)].forEach(function (el) {
         if (!el) return;
         if (on) el.removeAttribute("hidden"); else el.setAttribute("hidden", "hidden");
