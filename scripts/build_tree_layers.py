@@ -20,8 +20,8 @@ STOCKED = ("CHF", "MHF", "BHF")
 WHERE = "LUT IN ('CHF','MHF','BHF')"
 PAGE = 1000
 ORIGIN = {"lat": 51.3, "lng": -10.7}
-CELL = {"dlat": 0.05, "dlng": 0.075}
-MAX_I, MAX_J = 80, 90
+HEX = {"r_km": 3.25, "kx": 66.4, "ky": 111.2}
+Q_RANGE, R_RANGE = (-60, 80), (-2, 100)
 MIN_PLOTS, MAX_PLOTS = 20_000, 400_000
 NATIVE = {"OAK", "PO", "SO", "BI", "DBI", "SBI", "ALD", "ASH", "HAZ", "HOL", "YEW", "ROW", "RWN",
           "SAL", "WIL", "EWIL", "ELM", "HAW", "SP"}
@@ -226,27 +226,41 @@ def read_private(zip_path: str) -> dict[str, list]:
     return out
 
 
+def hex_of(lat: float, lng: float) -> tuple[int, int]:
+    x = (lng - ORIGIN["lng"]) * HEX["kx"]
+    y = (lat - ORIGIN["lat"]) * HEX["ky"]
+    fq = (math.sqrt(3) / 3 * x - y / 3) / HEX["r_km"]
+    fr = (2 / 3 * y) / HEX["r_km"]
+    fs = -fq - fr
+    q, r, s = round(fq), round(fr), round(fs)
+    dq, dr, ds = abs(q - fq), abs(r - fr), abs(s - fs)
+    if dq > dr and dq > ds:
+        q = -r - s
+    elif dr > ds:
+        r = -q - s
+    return q, r
+
+
 def grid(coillte, private, layer: str = "sitka") -> dict:
     cells: dict[tuple[int, int], float] = {}
     totals = {}
     for key, plots in (("coillte", coillte), ("private", private)):
         kept = 0.0
         for lat, lng, ha in plots:
-            i = math.floor((lng - ORIGIN["lng"]) / CELL["dlng"])
-            j = math.floor((lat - ORIGIN["lat"]) / CELL["dlat"])
-            if 0 <= i <= MAX_I and 0 <= j <= MAX_J:
-                cells[(i, j)] = cells.get((i, j), 0.0) + ha
+            q, r = hex_of(lat, lng)
+            if Q_RANGE[0] <= q <= Q_RANGE[1] and R_RANGE[0] <= r <= R_RANGE[1]:
+                cells[(q, r)] = cells.get((q, r), 0.0) + ha
                 kept += ha
         totals[key] = round(kept)
     rows = sorted([i, j, round(ha)] for (i, j), ha in cells.items() if round(ha) >= 1)
     return {
-        "version": 2,
+        "version": 3,
         "species": LAYERS[layer]["species"],
         "method": LAYERS[layer]["method"],
         "sources": [dict(s) for s in SOURCES],
         "fetched": dt.date.today().isoformat(),
         "origin": ORIGIN,
-        "cell": CELL,
+        "hex": HEX,
         "plots": len(coillte) + len(private),
         "coillte_ha": totals.get("coillte", 0),
         "private_ha": totals.get("private", 0),

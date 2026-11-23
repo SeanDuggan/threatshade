@@ -1,5 +1,6 @@
 import copy
 import json
+import math
 import re
 import sys
 import unittest
@@ -238,7 +239,7 @@ class SitkaGrid(unittest.TestCase):
         self.assertEqual(validate.validate_tree_grid(g).errors, [])
 
     def test_validator_rejects_bad_cells(self):
-        for bad in ([1, 2], [1, 2, 0], [1, 2, 99999], [-1, 2, 5], [1, 2, "5"], [1, 2, True]):
+        for bad in ([1, 2], [1, 2, 0], [1, 2, 99999], [-61, 2, 5], [1, 101, 5], [1, 2, "5"], [1, 2, True]):
             g = self.sample()
             g["cells"].append(bad)
             self.assertTrue(validate.validate_tree_grid(g).errors, bad)
@@ -252,6 +253,18 @@ class SitkaGrid(unittest.TestCase):
         self.assertTrue(validate.validate_tree_grid(g).errors)
         g = self.sample(); g["sources"][0]["url"] = "https://evil.example/"
         self.assertTrue(validate.validate_tree_grid(g).errors)
+        g = self.sample(); g["hex"] = dict(g["hex"], extra=1)
+        self.assertTrue(validate.validate_tree_grid(g).errors)
+
+    def test_hex_binning_round_trips_centres(self):
+        h = build_sitka.HEX
+        for q, r in ((0, 0), (5, 10), (-12, 40), (30, 77)):
+            x = h["r_km"] * math.sqrt(3) * (q + r / 2)
+            y = h["r_km"] * 1.5 * r
+            lat = build_sitka.ORIGIN["lat"] + y / h["ky"]
+            lng = build_sitka.ORIGIN["lng"] + x / h["kx"]
+            self.assertEqual(build_sitka.hex_of(lat, lng), (q, r))
+            self.assertEqual(build_sitka.hex_of(lat + 0.4 * h["r_km"] / h["ky"], lng), (q, r))
 
     def test_published_grid_is_valid(self):
         g = common.load_json(common.SITKA_PATH)

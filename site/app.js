@@ -123,7 +123,7 @@
     return m;
   }
   var P = [], SOURCES = {}, sectorFilter = "All", countyFilter = null, selected = null;
-  var svg, markers, tip, board, treeBlur, rowEls = {}, countyEls = {};
+  var svg, markers, tip, board, rowEls = {}, countyEls = {};
   function drawBaseMap() {
     svg = document.getElementById("map");
     svg.setAttribute("viewBox", "-6 -6 " + (W + 12).toFixed(0) + " " + (H + 12).toFixed(0));
@@ -140,8 +140,6 @@
     }
     var defs = s("defs", {}, svg);
     var landClip = s("clipPath", { id: "land-clip" }, defs);
-    var soft = s("filter", { id: "tree-soft", filterUnits: "userSpaceOnUse", x: -6, y: -6, width: (W + 12).toFixed(0), height: (H + 12).toFixed(0) }, defs);
-    treeBlur = s("feGaussianBlur", { stdDeviation: "2" }, soft);
     var land = s("g", { "class": "counties" }, svg);
     AREAS.forEach(function (a) {
       var d = a.rings.map(function (r) { return "M" + r.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join("L") + "Z"; }).join("");
@@ -159,7 +157,7 @@
     });
     var ni = AREAS.filter(function (a) { return a.id === "GB-NIR"; })[0];
     if (ni) { var c = proj(-6.75, 54.62); s("text", { x: c[0], y: c[1], "class": "ni-label", "text-anchor": "middle" }, svg).textContent = "N. IRELAND"; }
-    TREE_LAYERS.forEach(function (cfg) { treeGroups[cfg.key] = s("g", { "class": "tree-layer " + cfg.key, "aria-hidden": "true", "clip-path": "url(#land-clip)" }, svg); s("g", { filter: "url(#tree-soft)" }, treeGroups[cfg.key]); });
+    TREE_LAYERS.forEach(function (cfg) { treeGroups[cfg.key] = s("g", { "class": "tree-layer " + cfg.key, "aria-hidden": "true", "clip-path": "url(#land-clip)" }, svg); });
     markers = s("g", {}, svg);
     tip = document.getElementById("tip");
     var legend = document.getElementById("legend");
@@ -172,33 +170,35 @@
   var TREE_LAYERS = [
     { key: "sitka", url: "data/sitka-grid.json", show: "Show Sitka spruce plantations", hide: "Hide Sitka spruce plantations",
       about: "sitka-about",
-      intro: "Hectares of Sitka spruce in state (Coillte) and private forests, added up in squares of about 5 km. Mixed plots count only their Sitka share." },
+      intro: "Hectares of Sitka spruce in state (Coillte) and private forests, added up in hexagons about 5.6 km across. Mixed plots count only their Sitka share." },
     { key: "native", url: "data/native-grid.json", show: "Show native trees", hide: "Hide native trees",
       about: null,
-      intro: "Hectares of native Irish tree species (" + NATIVE_LIST + ") in state (Coillte) and private forests, added up in squares of about 5 km. This counts native trees, many of them planted in recent decades, not old native woodland. Broadleaf mixes whose species are not recorded are left out, so it is an undercount." }
+      intro: "Hectares of native Irish tree species (" + NATIVE_LIST + ") in state (Coillte) and private forests, added up in hexagons about 5.6 km across. This counts native trees, many of them planted in recent decades, not old native woodland. Broadleaf mixes whose species are not recorded are left out, so it is an undercount." }
   ];
   var TREE_STEPS = [10, 50, 200, 500];
   var TREE_LABELS = ["under 10", "10–49", "50–199", "200–499", "500+"];
   var treeGroups = {}, treeSetters = {};
   function checkGrid(g) {
-    if (!g || !Array.isArray(g.cells) || g.cells.length > 8000 || !g.origin || !g.cell) throw new Error("bad tree grid");
-    if (!num(g.origin.lat, 51, 52) || !num(g.origin.lng, -11, -10) || !num(g.cell.dlat, 0.01, 0.2) || !num(g.cell.dlng, 0.01, 0.3)) throw new Error("bad tree grid");
-    g.cells.forEach(function (c) { if (!Array.isArray(c) || !num(c[0], 0, 80) || !num(c[1], 0, 90) || !num(c[2], 1, 3000)) throw new Error("bad tree cell"); });
+    if (!g || g.version !== 3 || !Array.isArray(g.cells) || g.cells.length > 8000 || !g.origin || !g.hex) throw new Error("bad tree grid");
+    if (!num(g.origin.lat, 51, 52) || !num(g.origin.lng, -11, -10) || !num(g.hex.r_km, 1, 10) || !num(g.hex.kx, 60, 75) || !num(g.hex.ky, 110, 112)) throw new Error("bad tree grid");
+    g.cells.forEach(function (c) { if (!Array.isArray(c) || !num(c[0], -60, 80) || !num(c[1], -2, 100) || !num(c[2], 1, 3000)) throw new Error("bad tree cell"); });
     return g;
   }
   function ha(v) { return Math.round(v).toLocaleString("en-IE") + " ha"; }
   function drawTreeLayer(cfg, g, keysBox, btnBox) {
-    var group = treeGroups[cfg.key].firstChild;
-    var cellW = proj(g.origin.lng + g.cell.dlng, 53)[0] - proj(g.origin.lng, 53)[0];
-    treeBlur.setAttribute("stdDeviation", (cellW * 0.35).toFixed(2));
+    var group = treeGroups[cfg.key], R = g.hex.r_km, corners = [];
+    for (var k = 0; k < 6; k++) { var t = Math.PI / 180 * (60 * k - 30); corners.push([R * Math.cos(t), R * Math.sin(t)]); }
     g.cells.forEach(function (c) {
-      var lng0 = g.origin.lng + c[0] * g.cell.dlng, lat0 = g.origin.lat + c[1] * g.cell.dlat;
-      var a = proj(lng0, lat0 + g.cell.dlat), b = proj(lng0 + g.cell.dlng, lat0);
+      var x = R * Math.sqrt(3) * (c[0] + c[1] / 2), y = R * 1.5 * c[1];
+      var pts = corners.map(function (o) {
+        var p = proj(g.origin.lng + (x + o[0]) / g.hex.kx, g.origin.lat + (y + o[1]) / g.hex.ky);
+        return p[0].toFixed(1) + "," + p[1].toFixed(1);
+      }).join(" ");
       var step = TREE_STEPS.filter(function (t) { return c[2] >= t; }).length + 1;
-      s("rect", { x: a[0].toFixed(1), y: a[1].toFixed(1), width: (b[0] - a[0]).toFixed(1), height: (b[1] - a[1]).toFixed(1), "class": "s" + step }, group);
+      s("polygon", { points: pts, "class": "s" + step }, group);
     });
     var keyEl = h("div", { "class": "tree-key " + cfg.key, hidden: "hidden" });
-    var swatches = h("span", { "class": "tree-swatches" }, [h("b", { text: g.species + ":" }), " hectares per square (same scale on both layers, so switch between them to compare)"]);
+    var swatches = h("span", { "class": "tree-swatches" }, [h("b", { text: g.species + ":" }), " hectares per hexagon (same scale on both layers, so switch between them to compare)"]);
     TREE_LABELS.forEach(function (label, i) {
       swatches.appendChild(h("span", null, [h("i", { "class": "sw s" + (i + 1) }), label]));
     });

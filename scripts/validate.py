@@ -214,12 +214,12 @@ def validate_tree_grid(g, r: Result | None = None, label: str = "sitka") -> Resu
     if not isinstance(g, dict):
         r.err(f"{label}: top level must be an object")
         return r
-    allowed = {"version", "species", "method", "sources", "fetched", "origin", "cell", "plots",
+    allowed = {"version", "species", "method", "sources", "fetched", "origin", "hex", "plots",
                "coillte_ha", "private_ha", "total_ha", "cells"}
     if set(g) - allowed:
         r.err(f"{label}: unexpected keys {sorted(set(g) - allowed)}")
-    if g.get("version") != 2:
-        r.err(f"{label}.version must be 2")
+    if g.get("version") != 3:
+        r.err(f"{label}.version must be 3")
     _text(r, f"{label}.species", g.get("species"), 40)
     _text(r, f"{label}.method", g.get("method"), 250)
     srcs = g.get("sources")
@@ -240,11 +240,14 @@ def validate_tree_grid(g, r: Result | None = None, label: str = "sitka") -> Resu
         dt.date.fromisoformat(str(g.get("fetched")))
     except ValueError:
         r.err(f"{label}.fetched must be an ISO date")
-    o, c = g.get("origin") or {}, g.get("cell") or {}
+    o, c = g.get("origin") or {}, g.get("hex") or {}
     _num(r, f"{label}.origin.lat", o.get("lat"), 51, 52)
     _num(r, f"{label}.origin.lng", o.get("lng"), -11, -10)
-    _num(r, f"{label}.cell.dlat", c.get("dlat"), 0.01, 0.2)
-    _num(r, f"{label}.cell.dlng", c.get("dlng"), 0.01, 0.3)
+    if not isinstance(c, dict) or set(c) != {"r_km", "kx", "ky"}:
+        r.err(f"{label}.hex must have only r_km, kx and ky")
+    _num(r, f"{label}.hex.r_km", c.get("r_km"), 1, 10)
+    _num(r, f"{label}.hex.kx", c.get("kx"), 60, 75)
+    _num(r, f"{label}.hex.ky", c.get("ky"), 110, 112)
     _num(r, f"{label}.plots", g.get("plots"), 0, 500_000, integer=True)
     cells = g.get("cells")
     if not isinstance(cells, list) or not (1 <= len(cells) <= 8000):
@@ -253,9 +256,9 @@ def validate_tree_grid(g, r: Result | None = None, label: str = "sitka") -> Resu
     seen, total = set(), 0
     for k, cell in enumerate(cells):
         ok = (isinstance(cell, list) and len(cell) == 3 and all(isinstance(v, int) and not isinstance(v, bool) for v in cell)
-              and 0 <= cell[0] <= 80 and 0 <= cell[1] <= 90 and 1 <= cell[2] <= SITKA_CELL_MAX_HA)
+              and -60 <= cell[0] <= 80 and -2 <= cell[1] <= 100 and 1 <= cell[2] <= SITKA_CELL_MAX_HA)
         if not ok:
-            r.err(f"{label}.cells[{k}]: must be [column 0-80, row 0-90, hectares 1-{SITKA_CELL_MAX_HA}]")
+            r.err(f"{label}.cells[{k}]: must be [column -60-80, row -2-100, hectares 1-{SITKA_CELL_MAX_HA}]")
             continue
         if (cell[0], cell[1]) in seen:
             r.err(f"{label}.cells[{k}]: duplicate cell")

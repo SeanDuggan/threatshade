@@ -192,13 +192,17 @@ footer a{color:#f9f9f9}
 #countyfilter:empty{display:none}
 #map .tree-layer{display:none;pointer-events:none}
 #map .tree-layer.on{display:inline}
-#map .tree-layer.sitka rect,.tree-key.sitka i.sw{fill:#1f6b3a;background:#1f6b3a}
-#map .tree-layer.native rect,.tree-key.native i.sw{fill:#6a3d9a;background:#6a3d9a}
-#map .tree-layer .s1{fill-opacity:.22} .tree-swatches .s1{opacity:.22}
-#map .tree-layer .s2{fill-opacity:.38} .tree-swatches .s2{opacity:.38}
-#map .tree-layer .s3{fill-opacity:.55} .tree-swatches .s3{opacity:.55}
-#map .tree-layer .s4{fill-opacity:.72} .tree-swatches .s4{opacity:.72}
-#map .tree-layer .s5{fill-opacity:.88} .tree-swatches .s5{opacity:.88}
+#map .tree-layer polygon{stroke:#fff;stroke-width:.6;stroke-opacity:.7}
+#map .tree-layer.sitka .s1,.tree-key.sitka .s1{fill:#d9ecd0;background:#d9ecd0}
+#map .tree-layer.sitka .s2,.tree-key.sitka .s2{fill:#a6d391;background:#a6d391}
+#map .tree-layer.sitka .s3,.tree-key.sitka .s3{fill:#5fae5b;background:#5fae5b}
+#map .tree-layer.sitka .s4,.tree-key.sitka .s4{fill:#2a7d3d;background:#2a7d3d}
+#map .tree-layer.sitka .s5,.tree-key.sitka .s5{fill:#0d4a22;background:#0d4a22}
+#map .tree-layer.native .s1,.tree-key.native .s1{fill:#e8def2;background:#e8def2}
+#map .tree-layer.native .s2,.tree-key.native .s2{fill:#c6aedf;background:#c6aedf}
+#map .tree-layer.native .s3,.tree-key.native .s3{fill:#9a74c4;background:#9a74c4}
+#map .tree-layer.native .s4,.tree-key.native .s4{fill:#6a3d9a;background:#6a3d9a}
+#map .tree-layer.native .s5,.tree-key.native .s5{fill:#3d1a63;background:#3d1a63}
 .tree-buttons{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px}
 .tree-toggle.sitka[aria-pressed="true"]{background:#1f6b3a;color:#fff;border-color:#1f6b3a}
 .tree-toggle.native[aria-pressed="true"]{background:#6a3d9a;color:#fff;border-color:#6a3d9a}
