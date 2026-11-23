@@ -1,0 +1,30 @@
+{
+  "fetched": "2026-11-23",
+  "quarter": "Q2 2026",
+  "sites": [
+    {
+      "licensee": "Alert Packaging Limited",
+      "county": "Wicklow",
+      "sector": "Surface Coating",
+      "issue": "Emissions to air & odour management"
+    },
+    {
+      "licensee": "Arrow Group",
+      "county": "Kildare",
+      "sector": "Food & Drink",
+      "issue": "Odour management"
+    },
+    {
+      "licensee": "Chemifloc Limited",
+      "county": "Clare",
+      "sector": "Chemical",
+      "issue": "Groundwater contamination"
+    },
+    {
+      "licensee": "North Cork Co-Op Creameries Limited",
+      "county": "Cork",
+      "sector": "Food & Drink",
+      "issue": "Emissions to water & WWTP Operation"
+    }
+  ]
+}
